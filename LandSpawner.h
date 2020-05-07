@@ -27,7 +27,7 @@ public:
     int ifStatementTrigger_X, ifStatementTrigger_Y, ifStatementTrigger_NegativeX, ifStatementTrigger_NegativeY;
 
     //make this UPROPERTY editable in game or have some get_x function do it automatically in BeginPlay
-    int squareSize = 3000;
+    int squareSize = 10000;
 
     FVector coordinates = FVector(0, 0, 0);
 

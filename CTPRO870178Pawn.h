@@ -7,6 +7,7 @@
 //#include "Components/SynthComponent.h"
 
 //#include <string>
+#include "TimeSynthComponent.h"
 
 #include "CoreMinimal.h"
 #include "WheeledVehicle.h"
@@ -142,21 +143,57 @@ public:
 
 
 
+//	UPROPERTY(EditAnywhere, Category = "synth")
+//		class UMySynthComponent* mySynth;
+
+
+
 	UPROPERTY(EditAnywhere, Category = "synth")
-		class UMySynthComponent* mySynth;
+		class UModularSynthComponent* mySynth;
+
+	UPROPERTY(EditAnywhere, Category = "synth")
+		class UTimeSynthComponent* timeSynth;
+	/*
+	UPROPERTY(EditAnywhere, Category = "synth")
+		FOnQuantizationEvent::Add(&CountdownHasFinished);
+		*/
+
+	FScriptDelegate myScriptDelegate;
+
+//	FOnQuantizationEvent;
+
 
 
 	//                      timer handling stuff
 	void AdvanceTimer();
 
+	UFUNCTION()	
 	void CountdownHasFinished();
+
+
+	UPROPERTY(EditAnywhere, Category = "synth")
+		FOnQuantizationEvent myQuantEvent;
+
+
+//	UPROPERTY(EditAnywhere, Category = "synth")
+//	class FTimeSynthEventListener* myListener;
+
+
+
+
+	/*
+	UFUNCTION()
+	void everyBeat(ETimeSynthEventQuantization QuantizationType, int32 NumBars, float Beat);
+	*/
 
 	FTimerHandle CountdownTimerHandle;
 
 	int CountdownTime = 2;
 
-
+	/*
 	//      L-system 
 	FString LSysCurrent = "A";
-
+	int i;
+	FString LSysNext;
+	*/
 };

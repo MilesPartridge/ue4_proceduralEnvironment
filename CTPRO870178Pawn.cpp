@@ -1,11 +1,13 @@
 // Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+#include "CTPRO870178Pawn.h"
 
 
-#include "MySynthComponent.h"
+#include "SynthComponents/EpicSynth1Component.h"
+
+//#include "MySynthComponent.h"
 #include "Engine/World.h"
 #include <math.h> 
 
-#include "CTPRO870178Pawn.h"
 #include "CTPRO870178WheelFront.h"
 #include "CTPRO870178WheelRear.h"
 #include "CTPRO870178Hud.h"
@@ -38,12 +40,41 @@ const FName ACTPRO870178Pawn::LookRightBinding("LookRight");
 
 ACTPRO870178Pawn::ACTPRO870178Pawn()
 {
+
+	/*		this is to be replaced with a UE4 modular synth or granular synth
 	//set up synth and set initial freq
 	// the rest of the update synth code is at the bottom in the Timer functions
 	mySynth = CreateDefaultSubobject<UMySynthComponent>(TEXT("synth"));
 	mySynth->SetupAttachment(RootComponent);
 	mySynth->bAutoActivate = true;
 	mySynth->SetFrequency(880);
+	
+
+	mySynth = CreateDefaultSubobject<UModularSynthComponent>(TEXT("synth"));
+	mySynth->SetupAttachment(RootComponent);
+	mySynth->bAutoActivate = true;
+	
+	
+	timeSynth = CreateDefaultSubobject<UTimeSynthComponent>(TEXT("TimeSynth"));
+	timeSynth->SetupAttachment(RootComponent);
+	timeSynth->SetBPM(145);
+	
+	timeSynth->bAutoActivate = true;
+	*/
+	
+	
+
+//	timeSynth->AddQuantizationEventDelegate(ETimeSynthEventQuantization::QuarterNote, FOnQuantizationEventBP::BindUFunction(CountdownHasFinished));
+
+//	FOnQuantizationEvent::Add(&CountdownHasFinished());
+	
+//	myScriptDelegate.BindUFunction(this, &ACTPRO870178Pawn::CountdownHasFinished);
+
+//	timeSynth->AddQuantizationEventDelegate(ETimeSynthEventQuantization::Bar, FOnQuantizationEventBP::BindUFunction(this, &ACTPRO870178Pawn::CountdownHasFinished));
+
+//	timeSynth->AddQuantizationEventDelegate(ETimeSynthEventQuantization::Bar, );
+
+//	QuantisationEvent = CreateDefaultSubobject<FOnQuantizationEvent>(TEXT("TimeSynth"));
 
 
 
@@ -240,7 +271,23 @@ void ACTPRO870178Pawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*
+
+//	timeSynth->AddQuantizationEventDelegate.AddDynamic(this, &everyBeat);
+	myQuantEvent.AddDynamic(this, &ACTPRO870178Pawn::everyBeat);
+	myQuantEvent.Broadcast(ETimeSynthEventQuantization::QuarterNote, 4, 0.25);
+	
+	
+
+	i = 0;
+	LSysNext = "";
 	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ACTPRO870178Pawn::AdvanceTimer, 1.0f, true);
+
+	*/
+
+//	timeSynth->AddQuantizationEventDelegate(ETimeSynthEventQuantization::Bar, FOnQuantizationEventBP::BindUFunction(this, &ACTPRO870178Pawn::CountdownHasFinished));
+
+
 
 	bool bEnableInCar = false;
 #if HMD_MODULE_INCLUDED
@@ -325,10 +372,10 @@ void ACTPRO870178Pawn::CountdownHasFinished()
 		UE_LOG(LogTemp, Warning, TEXT("Current generation: %c"), it);
 		++it;
 	}
-	*/
-									/////////		L-SYSTEM
-	FString LSysNext = "";
-
+	
+	/////////		L-SYSTEM
+	
+	//this print to screen code was found in gamedev.tv forums at: https://community.gamedev.tv/t/print-debug-messages-to-screen-from-c/4764
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(
@@ -336,29 +383,47 @@ void ACTPRO870178Pawn::CountdownHasFinished()
 			5.0f,   // Duration of message - limits distance messages scroll onto screen
 			FColor::Cyan.WithAlpha(64),   // Color and transparancy!
 			FString::Printf(TEXT("        %s"), *LSysCurrent)  // Our usual text message format
-		);
+			);
 	}
 
-//	UE_LOG(LogTemp, Warning,TEXT("%s"), *LSysCurrent );
-
-	for (int i = 0; i < LSysCurrent.Len(); ++i)
-	{
-		if (LSysCurrent[i] == 'A')
-		{ 
-			LSysNext += "AB"; 
-
-		}   
-		else if (LSysCurrent[i] == 'B')
-		{ 
-			LSysNext += "A"; 
-
-		}
-	}
 	
-	LSysCurrent = LSysNext;
+	
+
+	if (LSysCurrent[i] == 'A')
+	{
+		LSysNext += "AB";
+		++i;
+		mySynth->NoteOn(69, FMath::RandRange(100, 127), FMath::RandRange(1, 4));
+
+		CountdownTime = FMath::RandRange(1, 4);
+		GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ACTPRO870178Pawn::AdvanceTimer, 1.0f, true); // using timeSynthComponent, can I strongly time this?
+	}
+	else if (LSysCurrent[i] == 'B')
+	{
+		LSysNext += "A";
+		++i;
+		mySynth->NoteOn(35, FMath::RandRange(100, 127), FMath::RandRange(1, 4));
+
+		CountdownTime = FMath::RandRange(1, 4);
+		GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ACTPRO870178Pawn::AdvanceTimer, 1.0f, true);
+	}
 
 
+				//at this point we have reached the current generation's maximum, and have fully grown the next gen. 
+				//Start the next gen, reset + start process again.
+	if (i >= LSysCurrent.Len()) {		
+		LSysCurrent = LSysNext;
+		i = 0;
+		LSysNext = "";
+	}
 
+	*/
+
+
+//	mySynth->NoteOn(FMath::RandRange(30, 72), FMath::RandRange(100, 127), FMath::RandRange(1, 4));
+
+
+	/*			cool, but I don't think I'll code the synth myself, I'll use ue4's modular synth
 
 	if (mySynth->Tremolo) {
 		mySynth->Tremolo = false; // set Tremolo effect
@@ -374,18 +439,36 @@ void ACTPRO870178Pawn::CountdownHasFinished()
 	float power = pow(2.0f, divisor);
 	float frequency = power * 440;
 
-	/*
+	
 	UE_LOG(LogTemp, Warning, TEXT("Int Random: %i"), randomFreq);
 	UE_LOG(LogTemp, Warning, TEXT("float difference: %f"), difference);
 	UE_LOG(LogTemp, Warning, TEXT("float divisor: %f"), divisor);
 	UE_LOG(LogTemp, Warning, TEXT("float power: %f"), power);
 	UE_LOG(LogTemp, Warning, TEXT("float frequency: %f"), frequency);
-	*/
+	
 	//	double MTOF = (pow(2.0f, ((randomFreq - 69.0f) / 12.0f))) * 440.0f;
 
 	mySynth->SetFrequency(frequency); // find midi to frequency values
-
-
+	
+	*/
 	CountdownTime = FMath::RandRange(1, 4);
 	GetWorldTimerManager().SetTimer(CountdownTimerHandle, this, &ACTPRO870178Pawn::AdvanceTimer, 1.0f, true);
+	
 }
+/*
+void ACTPRO870178Pawn::everyBeat(ETimeSynthEventQuantization QuantizationType, int32 NumBars, float Beat)
+{
+
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(
+			-1,        // don't over wrire previous message, add a new one
+			5.0f,   // Duration of message - limits distance messages scroll onto screen
+			FColor::Cyan.WithAlpha(64),   // Color and transparancy!
+			FString::Printf(TEXT("THE BROADCAST EVENT IS FIRING"))  // Our usual text message format
+			);
+	}
+
+}
+*/

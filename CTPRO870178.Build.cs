@@ -8,7 +8,7 @@ public class CTPRO870178 : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PhysXVehicles", "HeadMountedDisplay", "SignalProcessing" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "PhysXVehicles", "HeadMountedDisplay", "SignalProcessing", "TimeSynth" });
 
 		PublicDefinitions.Add("HMD_MODULE_INCLUDED=1");
 	}

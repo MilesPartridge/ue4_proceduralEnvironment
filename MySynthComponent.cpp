@@ -3,6 +3,8 @@
 
 #include "MySynthComponent.h"
 
+
+
 bool UMySynthComponent::Init(int32& SampleRate)
 {
 	NumChannels = 1;

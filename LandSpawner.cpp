@@ -20,6 +20,8 @@ void ALandSpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
+    squareSize = GetActorScale().Y * 100;
+
 
     //                 set the if statement under tick up so it triggers in the right place
     FVector Location_Finder = FVector(0, 0, 0);

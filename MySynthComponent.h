@@ -7,6 +7,7 @@
 #include "DSP/Osc.h"
 #include "MySynthComponent.generated.h"
 
+
 // ========================================================================
 // UMySynthComponent
 // Synth component class which implements USynthComponent
