@@ -103,6 +103,15 @@ void ALSystemSynth::BeginPlay()
 	i = 0;
 	LSysNext = "";
 
+	//set up a pattern for chords to play (and branch to and from)
+	growth.clear();
+	for (int grow = 0; grow < 16; grow++)
+	{
+		growth.push_back(FMath::RandRange(0, 1));
+	}
+	stem.push_back(growth);
+
+
 	if (Kick_01_Component && kick_01)
 	{
 		Kick_01_Component->SetSound(kick_01);
@@ -135,17 +144,11 @@ void ALSystemSynth::Tick(float DeltaTime)
 
 void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the drums and notes
 {
-	//this print to screen code was found in gamedev.tv forums at: https://community.gamedev.tv/t/print-debug-messages-to-screen-from-c/4764
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,        // don't over write previous message, add a new one
-			5.0f,   // Duration of message - limits distance messages scroll onto screen
-			FColor::Cyan.WithAlpha(64),   // Color and transparancy!
-			FString::Printf(TEXT("Rhythm        %s"), *LSysCurrent)  // Our usual text message format
-			);
-	}
+	//
 //	c = LSysCurrent[i];
+
+	
+
 
 	while (i < LSysCurrent.Len() && LSysCurrent[i] != 'B')		// this still loops when there is a non-B char at the end
 	{
@@ -156,15 +159,17 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 		{
 		case 'A':
 			LSysNext += Rule_A;
-			DrumsLSystem();
+			DrumsLSystem();//		bang drums every beat - their L-System runs in that manner
 			break;
 		case 'C':
 			LSysNext += Rule_C;
-			if (!playArpeggio)
+			if (!playArpeggio)// do not play chords while playing arpeggio
 			{
-				NotesLSystem();
-
-				UE_LOG(LogTemp, Warning, TEXT("CALLING NOTES"));
+				if (stem[stem.size()-1][beat] == 1)
+				{
+					NotesLSystem(playArpeggio);// calling this will always play a chord
+					UE_LOG(LogTemp, Warning, TEXT("CALLING NOTES"));
+				}
 			}
 			break;
 		case 'D':
@@ -176,7 +181,7 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 			break;
 		case 'E':
 			LSysNext += Rule_E;
-			// this rule just sets arpeggio by adding +ACBACBACBACB- to the l system string
+			// this rule just sets arpeggio
 			break;
 		case 'F':
 			LSysNext += Rule_F;
@@ -207,14 +212,227 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 				UE_LOG(LogTemp, Warning, TEXT("ARPEGGIO UN-SET"));
 			}
 			break;
+		case '[':
+			LSysNext += Rule_Branch;
+			//handles branching
+			growth.clear();
+			for (int grow = 0; grow < 16; grow++)
+			{
+				growth.push_back(FMath::RandRange(0, 1));
+			}
+			stem.push_back(growth);
+			break;
+		case ']':
+			LSysNext += Rule_EndBranch;
+			if (stem.size() > 1)
+			{
+				stem.pop_back();
+			}
+			break;
 		}
 
 		++i;
-		
+
 	}
 
 	if (playArpeggio)
 	{
+		NotesLSystem(playArpeggio);
+	}
+
+
+
+
+	++i;	// if this point is reached, it means that the while loop has either reached 'B' or has gone out of bounds. Either way, ++i (hence why next 'if' check is set up as is)
+
+	if (reset)		// from the pause menu, the user can reset the L system with a new starting string
+	{
+		LSysCurrent = LSysResetAxiom;
+		i = 0;
+		octaveShifter = 0;
+		currentNote = 0;
+		LSysNext = "";
+		generation = 0;
+		playDrums = false;
+		reset = false;
+	}
+
+
+	//at this point we have reached the current generation's maximum, and have fully grown the next gen. 
+	//Start the next gen, reset + start process again.
+	if (i >= LSysCurrent.Len()) {
+		LSysCurrent = LSysNext;
+		i = 0;
+		++generation;
+		LSysNext = "";
+		if (generation >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
+		{
+			playDrums = true;
+		}
+		else if (generation >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
+		{
+			playDrums = false;
+		}
+		else if (generation >= 6)					// make the greater than value a modifiable variable
+		{
+			playDrums = true;
+		}
+	}
+	//keep track of which beat we are on
+	++beat;
+	if (beat >= 15)
+	{
+		beat = 0;
+	}
+}
+
+void ALSystemSynth::NotesLSystem(bool arpeggio)
+{
+
+	//	c = LSysCurrent[i];
+	if (!arpeggio)		// note the arpeggio completely disregards the L-System and plays the last played chord's notes
+	{
+		while (Notesi < NotesLSysCurrent.Len() && NotesLSysCurrent[Notesi] != 'B')		// this still loops when there is a non-B char at the end
+		{
+
+			c = NotesLSysCurrent[Notesi];		// to avoid recopying this each iteration of the loop, make this a char* pointer to the ith point in the string
+
+			switch (c)
+			{
+			case 'A':
+				NotesLSysNext += NotesRule_A;
+				break;
+			case 'C': 	// if an arpeggio is playing, it will play with the current chord, this stops any shifting of notes
+				NotesLSysNext += NotesRule_C;
+				currentNote += 5;
+				if (currentNote > 6)
+					currentNote -= 7;
+				break;
+			case 'D':
+				NotesLSysNext += NotesRule_D;
+				currentNote -= 3;
+				if (currentNote < 0)
+					currentNote += 7;
+				break;
+			case '+':
+				NotesLSysNext += NotesRule_E;
+				octaveShifter += 12;
+				if (octaveShifter > 50)
+					octaveShifter -= 12;
+				break;
+			case '-':
+				NotesLSysNext += NotesRule_F;
+				octaveShifter -= 12;
+				if (octaveShifter < -12)
+					octaveShifter += 12;
+				break;
+			case 'G':
+				NotesLSysNext += NotesRule_G;
+				//set major
+				useMajorChords = true;
+				useMinorChords = false;
+				useAugmentedChords = false;
+				useDiminishedChords = false;
+				chordChooser = 0;
+				maxNoChords = 12;
+				break;
+			case 'H':
+				NotesLSysNext += NotesRule_H;
+				//set minor
+				useMinorChords = true;
+				useMajorChords = false;
+				useAugmentedChords = false;
+				useDiminishedChords = false;
+				chordChooser = 0;
+				maxNoChords = 12;
+				break;
+			case 'I':
+				NotesLSysNext += NotesRule_I;
+				//set aug
+				useAugmentedChords = true;
+				useMajorChords = false;
+				useMinorChords = false;
+				useDiminishedChords = false;
+				chordChooser = 0;
+				maxNoChords = 4;
+				break;
+			case 'E':
+				NotesLSysNext += NotesRule_Plus;
+				//set dim
+				useDiminishedChords = true;
+				useMajorChords = false;
+				useMinorChords = false;
+				useAugmentedChords = false;
+				chordChooser = 0;
+				maxNoChords = 12;
+				break;
+			case 'F':
+				NotesLSysNext += NotesRule_Minus;
+				//move chord
+				//choose randomly?
+				chordChooser = FMath::RandRange(0, maxNoChords - 1);
+				/*	or move through sequentially?
+				++chordChooser;
+				if (chordChooser >= maxNoChords)
+				{
+					chordChooser = 0;
+				}
+				*/
+				break;
+			case 'J':
+				//				handling note offs
+
+				NotesLSysNext += NotesRule_J;
+				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], true, false);
+
+				break;
+
+			}
+
+			++Notesi;
+		}
+
+
+		++Notesi;	// if this point is reached, it means that the while loop has either reached 'B' or has gone out of bounds. Either way, ++i (hence why next 'if' check is set up as is)
+
+		if (Notesreset)		// from the pause menu, the user can reset the L system with a new starting string
+		{
+			NotesLSysCurrent = NotesLSysResetAxiom;
+			Notesi = 0;
+			octaveShifter = 0;
+			currentNote = 0;
+			NotesLSysNext = "";
+			Notesgeneration = 0;
+			playDrums = false;
+			Notesreset = false;
+		}
+
+
+		//at this point we have reached the current generation's maximum, and have fully grown the next gen. 
+		//Start the next gen, reset + start process again.
+		if (Notesi >= NotesLSysCurrent.Len()) {
+			NotesLSysCurrent = NotesLSysNext;
+			Notesi = 0;
+			++Notesgeneration;
+			NotesLSysNext = "";
+			if (Notesgeneration >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
+			{
+				playDrums = true;
+			}
+			else if (Notesgeneration >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
+			{
+				playDrums = false;
+			}
+			else if (Notesgeneration >= 6)					// make the greater than value a modifiable variable
+			{
+				playDrums = true;
+			}
+		}
+	}
+
+	if (arpeggio)		// the arpeggio plays the last played chord's notes. This helps with congruency
+	{
+
 		UE_LOG(LogTemp, Warning, TEXT("PLAYING NOTE"));
 		switch (arpeggioCounter)
 		{
@@ -303,247 +521,47 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 			UE_LOG(LogTemp, Error, TEXT("DEFAULT TRIGGERED !!!!!"));
 			break;
 		}
-	}
 
-
-	if (playArpeggio)
-	{
 		++arpeggioCounter;
 		if (arpeggioCounter >= 3)
 		{
 			arpeggioCounter = 0;
 		}
 		UE_LOG(LogTemp, Warning, TEXT("ARPEGGIO COUNTER: %d"), arpeggioCounter);
-	}
-
-	++i;	// if this point is reached, it means that the while loop has either reached 'B' or has gone out of bounds. Either way, ++i (hence why next 'if' check is set up as is)
-
-	if (reset)		// from the pause menu, the user can reset the L system with a new starting string
-	{
-		LSysCurrent = LSysResetAxiom;
-		i = 0;
-		octaveShifter = 0;
-		currentNote = 0;
-		LSysNext = "";
-		generation = 0;
-		playDrums = false;
-		reset = false;
-	}
 
 
-	//at this point we have reached the current generation's maximum, and have fully grown the next gen. 
-	//Start the next gen, reset + start process again.
-	if (i >= LSysCurrent.Len()) {
-		LSysCurrent = LSysNext;
-		i = 0;
-		++generation;
-		LSysNext = "";
-		if (generation >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
-		{
-			playDrums = true;
+	} else {
+		UE_LOG(LogTemp, Error, TEXT("CHORD PLAYING"));
+		if (useMajorChords)
+		{		//			<choose note in scale array>					<add triad to that number to make chord>
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 		}
-		else if (generation >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
+		if (useMinorChords)
 		{
-			playDrums = false;
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 		}
-		else if (generation >= 6)					// make the greater than value a modifiable variable
+		if (useAugmentedChords)
 		{
-			playDrums = true;
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 		}
-	}
-
-}
-
-void ALSystemSynth::NotesLSystem()
-{
-	//this print to screen code was found in gamedev.tv forums at: https://community.gamedev.tv/t/print-debug-messages-to-screen-from-c/4764
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,        // don't over write previous message, add a new one
-			5.0f,   // Duration of message - limits distance messages scroll onto screen
-			FColor::Orange.WithAlpha(64),   // Color and transparancy!
-			FString::Printf(TEXT("Notes        %s"), *NotesLSysCurrent)  // Our usual text message format
-		);
-	}
-
-	//	c = LSysCurrent[i];
-
-	while (Notesi < NotesLSysCurrent.Len() && NotesLSysCurrent[Notesi] != 'B')		// this still loops when there is a non-B char at the end
-	{
-
-		c = NotesLSysCurrent[Notesi];		// to avoid recopying this each iteration of the loop, make this a char* pointer to the ith point in the string
-
-		switch (c)
+		if (useDiminishedChords)
 		{
-		case 'A':
-			NotesLSysNext += NotesRule_A;
-			UE_LOG(LogTemp, Error, TEXT("CHORD PLAYING"));
-				if (useMajorChords)
-				{		//			<choose note in scale array>					<add triad to that number to make chord>
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-				}
-				if (useMinorChords)
-				{
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-				}
-				if (useAugmentedChords)
-				{
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-				}
-				if (useDiminishedChords)
-				{
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-					mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-				}
-			break;
-		case 'C': 	// if an arpeggio is playing, it will play with the current chord, this stops any shifting of notes
-				NotesLSysNext += NotesRule_C;
-				currentNote += 5;
-				if (currentNote > 6)
-					currentNote -= 7;
-			break;
-		case 'D':
-				NotesLSysNext += NotesRule_D;
-				currentNote -= 3;
-				if (currentNote < 0)
-					currentNote += 7;
-			break;
-		case '+':
-				NotesLSysNext += NotesRule_E;
-				octaveShifter += 12;
-				if (octaveShifter > 50)
-					octaveShifter -= 12;
-			break;
-		case '-':
-				NotesLSysNext += NotesRule_F;
-				octaveShifter -= 12;
-				if (octaveShifter < -12)
-					octaveShifter += 12;
-			break;
-		case 'G':
-			NotesLSysNext += NotesRule_G;
-			//set major
-			useMajorChords = true;
-			useMinorChords = false;
-			useAugmentedChords = false;
-			useDiminishedChords = false;
-			chordChooser = 0;
-			maxNoChords = 12;
-			break;
-		case 'H':
-			NotesLSysNext += NotesRule_H;
-			//set minor
-			useMinorChords = true;
-			useMajorChords = false;
-			useAugmentedChords = false;
-			useDiminishedChords = false;
-			chordChooser = 0;
-			maxNoChords = 12;
-			break;
-		case 'I':
-			NotesLSysNext += NotesRule_I;
-			//set aug
-			useAugmentedChords = true;
-			useMajorChords = false;
-			useMinorChords = false;
-			useDiminishedChords = false;
-			chordChooser = 0;
-			maxNoChords = 4;
-			break;
-		case 'E':
-			NotesLSysNext += NotesRule_Plus;
-			//set dim
-			useDiminishedChords = true;
-			useMajorChords = false;
-			useMinorChords = false;
-			useAugmentedChords = false;
-			chordChooser = 0;
-			maxNoChords = 12;
-			break;
-		case 'F':
-			NotesLSysNext += NotesRule_Minus;
-			//move chord
-			//choose randomly?
-			chordChooser = FMath::RandRange(0, maxNoChords - 1);
-			/*	or move through sequentially?
-			++chordChooser;
-			if (chordChooser >= maxNoChords)
-			{
-				chordChooser = 0;
-			}
-			*/
-			break;
-		case 'J':
-			//				handling note offs
-			
-			NotesLSysNext += NotesRule_J;
-			mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], true, false);
-			
-			break;
-
-		}
-
-		++Notesi;
-	}
-
-
-	++Notesi;	// if this point is reached, it means that the while loop has either reached 'B' or has gone out of bounds. Either way, ++i (hence why next 'if' check is set up as is)
-
-	if (Notesreset)		// from the pause menu, the user can reset the L system with a new starting string
-	{
-		NotesLSysCurrent = NotesLSysResetAxiom;
-		Notesi = 0;
-		octaveShifter = 0;
-		currentNote = 0;
-		NotesLSysNext = "";
-		Notesgeneration = 0;
-		playDrums = false;
-		Notesreset = false;
-	}
-
-
-	//at this point we have reached the current generation's maximum, and have fully grown the next gen. 
-	//Start the next gen, reset + start process again.
-	if (Notesi >= NotesLSysCurrent.Len()) {
-		NotesLSysCurrent = NotesLSysNext;
-		Notesi = 0;
-		++Notesgeneration;
-		NotesLSysNext = "";
-		if (Notesgeneration >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
-		{
-			playDrums = true;
-		}
-		else if (Notesgeneration >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
-		{
-			playDrums = false;
-		}
-		else if (Notesgeneration >= 6)					// make the greater than value a modifiable variable
-		{
-			playDrums = true;
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 		}
 	}
 }
 
 void ALSystemSynth::ModularLSystem()
 {
-	//this print to screen code was found in gamedev.tv forums at: https://community.gamedev.tv/t/print-debug-messages-to-screen-from-c/4764
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,        // don't over write previous message, add a new one
-			5.0f,   // Duration of message - limits distance messages scroll onto screen
-			FColor::White.WithAlpha(64),   // Color and transparancy!
-			FString::Printf(TEXT("Modular        %s"), *ModularLSysCurrent)  // Our usual text message format
-		);
-	}
+	
 
 	//	c = LSysCurrent[i];
 
@@ -555,7 +573,7 @@ void ALSystemSynth::ModularLSystem()
 		{
 		case 'A':
 			ModularLSysNext += ModularRule_A;
-			attack = FMath::RandRange(10, 4000);
+			attack = FMath::RandRange(10, 2000);
 			mySynth->SetAttackTime(attack);	
 			break;
 		case 'C':
@@ -570,7 +588,7 @@ void ALSystemSynth::ModularLSystem()
 			break;
 		case 'E':
 			ModularLSysNext += ModularRule_E;
-			release = FMath::RandRange(10, 4000);
+			release = FMath::RandRange(10, 600);
 			mySynth->SetReleaseTime(release);
 			break;
 		case 'F':
@@ -579,16 +597,16 @@ void ALSystemSynth::ModularLSystem()
 			waveForm = FMath::RandRange(0, 3);
 			switch (waveForm)
 			{
-			case '0':
+			case 0:
 				mySynth->SetOscType(0, ESynth1OscType::Sine);
 				break;
-			case '1':
+			case 1:
 				mySynth->SetOscType(0, ESynth1OscType::Saw);
 				break;
-			case '2':
+			case 2:
 				mySynth->SetOscType(0, ESynth1OscType::Triangle);
 				break;
-			case '3':
+			case 3:
 				mySynth->SetOscType(0, ESynth1OscType::Square);
 				break;
 			}
@@ -654,16 +672,7 @@ void ALSystemSynth::ModularLSystem()
 
 void ALSystemSynth::DrumsLSystem()
 {
-	//this print to screen code was found in gamedev.tv forums at: https://community.gamedev.tv/t/print-debug-messages-to-screen-from-c/4764
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(
-			-1,        // don't over write previous message, add a new one
-			5.0f,   // Duration of message - limits distance messages scroll onto screen
-			FColor::Cyan.WithAlpha(64),   // Color and transparancy!
-			FString::Printf(TEXT("Drums        %s"), *DrumsLSysCurrent)  // Our usual text message format
-		);
-	}
+	
 
 	//	c = LSysCurrent[i];
 
@@ -697,15 +706,41 @@ void ALSystemSynth::DrumsLSystem()
 			break;
 		case 'E':
 			DrumsLSysNext += DrumsRule_E;
+			//this is used for drum fills
 			break;
 		case 'F':
 			DrumsLSysNext += DrumsRule_F;
+			//this is used for drum fills
 			break;
 		case 'G':
-			DrumsLSysNext += DrumsRule_G;
+			//randomly play kick or snare
+			kickSnareRandomiser = FMath::RandRange(0, 1);
+			if (kickSnareRandomiser)
+			{
+				if (Kick_01_Component && playDrums)
+				{
+					Kick_01_Component->Play(0.0f);
+				}
+			} else {
+				if (Snare_01_Component && playDrums)
+				{
+					Snare_01_Component->Play(0.0f);
+				}
+			}
 			break;
 		case 'H':
-			DrumsLSysNext += DrumsRule_H;
+			//this is used for drum fills
+			if (Kick_01_Component && playDrums)
+			{
+				Kick_01_Component->Play(0.0f);
+			}
+			break;
+		case 'I':
+			//this is used for drum fills
+			if (Snare_01_Component && playDrums)
+			{
+				Snare_01_Component->Play(0.0f);
+			}
 			break;
 		case '+':
 			DrumsLSysNext += DrumsRule_Plus;
@@ -744,17 +779,14 @@ void ALSystemSynth::DrumsLSystem()
 		Drumsi = 0;
 		++Drumsgeneration;
 		DrumsLSysNext = "";
-		if (Drumsgeneration >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
+		if (Drumsgeneration == 12)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
 		{
-			playDrums = true;
+			DrumsLSysCurrent = DrumsRule_E;
 		}
-		else if (Drumsgeneration >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
+		else if (Drumsgeneration >= 16)					// make the greater than value a modifiable variable // ************does this work? More testing
 		{
-			playDrums = false;
-		}
-		else if (Drumsgeneration >= 6)					// make the greater than value a modifiable variable
-		{
-			playDrums = true;
+			DrumsLSysCurrent = DrumsRule_C;
+			Drumsgeneration = 0;
 		}
 	}
 }

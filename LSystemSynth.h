@@ -50,7 +50,7 @@ public:
 		void TickLSystem();
 
 	void DrumsLSystem();
-	void NotesLSystem();
+	void NotesLSystem(bool arpeggio = false);
 	void ModularLSystem();
 
 
@@ -153,21 +153,25 @@ public:
 	FString LSysNext;
 	FString LSysResetAxiom = "ACB";
 	bool reset = false, playDrums = false;
-	FString Rule_A = "CABE", Rule_C = "CADB", Rule_D = "+ACB", Rule_E = "-AB", Rule_F = "", Rule_G = "", Rule_H = "", Rule_Plus = "", Rule_Minus = "";
+	std::vector<int> growth;
+	std::vector<std::vector<int>> stem; //set up a pattern for chords to play (and branch to and from)
+	int beat = 0;
+	FString Rule_A = "CABE", Rule_C = "CADB", Rule_D = "+ACB", Rule_E = "-CAB", Rule_F = "", Rule_G = "", Rule_H = "", Rule_Plus = "CAB]", Rule_Minus = "CAB[", Rule_Branch = "", Rule_EndBranch = "";
 	//      Drums L-system 
-	FString DrumsLSysCurrent = "ADB";
+	FString DrumsLSysCurrent = "ADBDB";
 	int Drumsi, Drumsgeneration = 0;
 	FString DrumsLSysNext;
-	FString DrumsLSysResetAxiom = "ADB";
+	FString DrumsLSysResetAxiom = "ADBDB";
 	bool Drumsreset = false;
-	FString DrumsRule_A = "DBDCB", DrumsRule_C = "DBDAB", DrumsRule_D = "", DrumsRule_E = "", DrumsRule_F = "", DrumsRule_G = "", DrumsRule_H = "", DrumsRule_Plus = "", DrumsRule_Minus = "";
+	FString DrumsRule_A = "CDBDB", DrumsRule_C = "ADBDB", DrumsRule_D = "", DrumsRule_E = "FHDBHDB", DrumsRule_F = "EGDBGDB", DrumsRule_Plus = "", DrumsRule_Minus = "";
+	int kickSnareRandomiser;
 	//      Notes L-system 
-	FString NotesLSysCurrent = "++ADBJB";
+	FString NotesLSysCurrent = "++AB";
 	int Notesi, Notesgeneration = 0;
 	FString NotesLSysNext;
-	FString NotesLSysResetAxiom = "ADBJB";
+	FString NotesLSysResetAxiom = "++AB";
 	bool Notesreset = false;
-	FString NotesRule_A = "FDB", NotesRule_C = "FHAB", NotesRule_D = "FEJB", NotesRule_E = "CAF-B", NotesRule_F = "DIJB", NotesRule_G = "FJB", NotesRule_H = "GDFAB", NotesRule_I = "FJB", NotesRule_Plus = "IFJEB", NotesRule_Minus = "DAB", NotesRule_J = "HEB";
+	FString NotesRule_A = "AF", NotesRule_C = "FHAB", NotesRule_D = "FEJB", NotesRule_E = "CAF-B", NotesRule_F = "DIJB", NotesRule_G = "FJB", NotesRule_H = "GDFAB", NotesRule_I = "FJB", NotesRule_Plus = "IFJEB", NotesRule_Minus = "DAB", NotesRule_J = "HEB";
 	//      Modular L-system 
 	FString ModularLSysCurrent = "ACDEB";
 	int Modulari, Modulargeneration = 0;
