@@ -518,24 +518,28 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 		UE_LOG(LogTemp, Error, TEXT("CHORD PLAYING"));
 		if (useMajorChords)
 		{		//			<choose note in scale array>					<add triad to that number to make chord>
+			mySynth->NoteOff(1, true, false);
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 		}
 		if (useMinorChords)
 		{
+			mySynth->NoteOff(1, true, false);
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 		}
 		if (useAugmentedChords)
 		{
+			mySynth->NoteOff(1, true, false);
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 		}
 		if (useDiminishedChords)
 		{
+			mySynth->NoteOff(1, true, false);
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
 			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
