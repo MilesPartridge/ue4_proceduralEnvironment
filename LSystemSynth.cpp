@@ -798,6 +798,16 @@ void ALSystemSynth::Set_Rule_H(FString ruleH)
 	Rule_H = ruleH;
 }
 
+void ALSystemSynth::Set_Rule_I(FString ruleI)
+{
+	Rule_I = ruleI;
+}
+
+void ALSystemSynth::Set_Rule_J(FString ruleJ)
+{
+	Rule_J = ruleJ;
+}
+
 void ALSystemSynth::Set_Rule_Plus(FString rulePlus)
 {
 	Rule_Plus = rulePlus;
@@ -807,6 +817,233 @@ void ALSystemSynth::Set_Rule_Minus(FString ruleMinus)
 {
 	Rule_Minus = ruleMinus;
 }
+
+void ALSystemSynth::Set_Rule_Branch(FString ruleBranch)
+{
+	Rule_Branch = ruleBranch;
+}
+
+void ALSystemSynth::Set_Rule_EndBranch(FString ruleEndBranch)
+{
+	Rule_EndBranch = ruleEndBranch;
+}
+
+
+// SETTING DRUM LSYSTEMS ////////////***
+
+
+void ALSystemSynth::Set_Drum_Rule_A(FString Drum_ruleA)
+{
+	DrumsRule_A = Drum_ruleA;
+}
+
+void ALSystemSynth::Set_Drum_Rule_C(FString Drum_ruleC)
+{
+	DrumsRule_C = Drum_ruleC;
+}
+
+void ALSystemSynth::Set_Drum_Rule_D(FString Drum_ruleD)
+{
+	DrumsRule_D = Drum_ruleD;
+}
+
+void ALSystemSynth::Set_Drum_Rule_E(FString Drum_ruleE)
+{
+	DrumsRule_E = Drum_ruleE;
+}
+
+void ALSystemSynth::Set_Drum_Rule_F(FString Drum_ruleF)
+{
+	DrumsRule_F = Drum_ruleF;
+}
+
+void ALSystemSynth::Set_Drum_Rule_G(FString Drum_ruleG)
+{
+	DrumsRule_G = Drum_ruleG;
+}
+
+void ALSystemSynth::Set_Drum_Rule_H(FString Drum_ruleH)
+{
+	DrumsRule_H = Drum_ruleH;
+}
+
+void ALSystemSynth::Set_Drum_Rule_I(FString Drum_ruleI)
+{
+	DrumsRule_I = Drum_ruleI;
+}
+
+void ALSystemSynth::Set_Drum_Rule_J(FString Drum_ruleJ)
+{
+	DrumsRule_J = Drum_ruleJ;
+}
+
+void ALSystemSynth::Set_Drum_Rule_Plus(FString Drum_rulePlus)
+{
+	DrumsRule_Plus = Drum_rulePlus;
+}
+
+void ALSystemSynth::Set_Drum_Rule_Minus(FString Drum_ruleMinus)
+{
+	DrumsRule_Minus = Drum_ruleMinus;
+}
+
+void ALSystemSynth::Set_Drum_Rule_Branch(FString Drum_ruleBranch)
+{
+	DrumsRule_Branch = Drum_ruleBranch;
+}
+
+void ALSystemSynth::Set_Drum_Rule_EndBranch(FString Drum_ruleEndBranch)
+{
+	DrumsRule_EndBranch = Drum_ruleEndBranch;
+}
+
+
+
+
+// SETTING NOTE LSYSTEMS ////////////***
+
+
+void ALSystemSynth::Set_Note_Rule_A(FString Note_ruleA)
+{
+	NotesRule_A = Note_ruleA;
+}
+
+void ALSystemSynth::Set_Note_Rule_C(FString Note_ruleC)
+{
+	NotesRule_C = Note_ruleC;
+}
+
+void ALSystemSynth::Set_Note_Rule_D(FString Note_ruleD)
+{
+	NotesRule_D = Note_ruleD;
+}
+
+void ALSystemSynth::Set_Note_Rule_E(FString Note_ruleE)
+{
+	NotesRule_E = Note_ruleE;
+}
+
+void ALSystemSynth::Set_Note_Rule_F(FString Note_ruleF)
+{
+	NotesRule_F = Note_ruleF;
+}
+
+void ALSystemSynth::Set_Note_Rule_G(FString Note_ruleG)
+{
+	NotesRule_G = Note_ruleG;
+}
+
+void ALSystemSynth::Set_Note_Rule_H(FString Note_ruleH)
+{
+	NotesRule_H = Note_ruleH;
+}
+
+void ALSystemSynth::Set_Note_Rule_I(FString Note_ruleI)
+{
+	NotesRule_I = Note_ruleI;
+}
+
+void ALSystemSynth::Set_Note_Rule_J(FString Note_ruleJ)
+{
+	NotesRule_J = Note_ruleJ;
+}
+
+void ALSystemSynth::Set_Note_Rule_Plus(FString Note_rulePlus)
+{
+	NotesRule_Plus = Note_rulePlus;
+}
+
+void ALSystemSynth::Set_Note_Rule_Minus(FString Note_ruleMinus)
+{
+	NotesRule_Minus = Note_ruleMinus;
+}
+
+void ALSystemSynth::Set_Note_Rule_Branch(FString Note_ruleBranch)
+{
+	NotesRule_Branch = Note_ruleBranch;
+}
+
+void ALSystemSynth::Set_Note_Rule_EndBranch(FString Note_ruleEndBranch)
+{
+	NotesRule_EndBranch = Note_ruleEndBranch;
+}
+
+
+
+
+
+// SETTING MODULAR LSYSTEMS ////////////***
+
+
+void ALSystemSynth::Set_Modular_Rule_A(FString Modular_ruleA)
+{
+	ModularRule_A = Modular_ruleA;
+}
+
+void ALSystemSynth::Set_Modular_Rule_C(FString Modular_ruleC)
+{
+	ModularRule_C = Modular_ruleC;
+}
+
+void ALSystemSynth::Set_Modular_Rule_D(FString Modular_ruleD)
+{
+	ModularRule_D = Modular_ruleD;
+}
+
+void ALSystemSynth::Set_Modular_Rule_E(FString Modular_ruleE)
+{
+	ModularRule_E = Modular_ruleE;
+}
+
+void ALSystemSynth::Set_Modular_Rule_F(FString Modular_ruleF)
+{
+	ModularRule_F = Modular_ruleF;
+}
+
+void ALSystemSynth::Set_Modular_Rule_G(FString Modular_ruleG)
+{
+	ModularRule_G = Modular_ruleG;
+}
+
+void ALSystemSynth::Set_Modular_Rule_H(FString Modular_ruleH)
+{
+	ModularRule_H = Modular_ruleH;
+}
+
+void ALSystemSynth::Set_Modular_Rule_I(FString Modular_ruleI)
+{
+	ModularRule_I = Modular_ruleI;
+}
+
+void ALSystemSynth::Set_Modular_Rule_J(FString Modular_ruleJ)
+{
+	ModularRule_J = Modular_ruleJ;
+}
+
+void ALSystemSynth::Set_Modular_Rule_Plus(FString Modular_rulePlus)
+{
+	ModularRule_Plus = Modular_rulePlus;
+}
+
+void ALSystemSynth::Set_Modular_Rule_Minus(FString Modular_ruleMinus)
+{
+	ModularRule_Minus = Modular_ruleMinus;
+}
+
+void ALSystemSynth::Set_Modular_Rule_Branch(FString Modular_ruleBranch)
+{
+	ModularRule_Branch = Modular_ruleBranch;
+}
+
+void ALSystemSynth::Set_Modular_Rule_EndBranch(FString Modular_ruleEndBranch)
+{
+	ModularRule_EndBranch = Modular_ruleEndBranch;
+}
+
+
+
+
+// SET RESET AXIOM ///////********
 
 void ALSystemSynth::Set_New_Axiom(FString axiom)
 {
@@ -870,6 +1107,8 @@ FString ALSystemSynth::Get_New_Axiom()
 	reset = true;
 }
 
+
+
 void ALSystemSynth::Save_Game()
 {
 	if (ULSystemSaveManager* SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::CreateSaveGameObject(ULSystemSaveManager::StaticClass())))
@@ -888,7 +1127,7 @@ void ALSystemSynth::Save_Game()
 
 
 		// Save the data immediately.
-		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, "HelloWorld", 0))
+		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, "LSystem", 0))
 		{
 			// Save succeeded.
 			UE_LOG(LogTemp, Warning, TEXT("Save Successful"));
@@ -900,7 +1139,7 @@ void ALSystemSynth::Load_Game()
 {
 	ULSystemSaveManager* SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::CreateSaveGameObject(ULSystemSaveManager::StaticClass()));
 
-	SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::LoadGameFromSlot("HelloWorld", 0));
+	SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::LoadGameFromSlot("LSystem", 0));
 
 	LSysResetAxiom = SaveGameInstance->Axiom;
 	Rule_A = SaveGameInstance->Rule_A;
