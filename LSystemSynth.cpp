@@ -104,12 +104,14 @@ void ALSystemSynth::BeginPlay()
 	LSysNext = "";
 
 	//set up a pattern for chords to play (and branch to and from)
-	growth.clear();
+	branch.clear();
 	for (int grow = 0; grow < 16; grow++)
 	{
-		growth.push_back(FMath::RandRange(0, 1));
+		branch.push_back(FMath::RandRange(0, 4));		// this gives a one in 5 chance of being a note to play
 	}
-	stem.push_back(growth);
+	stem.push_back(branch);
+
+	treeSize = FMath::RandRange(3, 5); // this is the number of branches produced before the song moves on to its next part
 
 
 	if (Kick_01_Component && kick_01)
@@ -125,14 +127,6 @@ void ALSystemSynth::BeginPlay()
 		HihatClosed_01_Component->SetSound(hihatClosed_01);
 	}
 
-	for (int inti = 0; inti < DiminishedChords.size(); inti++)		//***** this prints to output log at the start to check chord arrays are correct. REMOVE LATER ************//
-	{
-		for (int j = 0; j < DiminishedChords[inti].size(); j++)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("%d"), DiminishedChords[inti][j]);
-		}
-		UE_LOG(LogTemp, Warning, TEXT("next"));
-	}
 }
 
 // Called every frame
@@ -147,7 +141,6 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 	//
 //	c = LSysCurrent[i];
 
-	
 
 
 	while (i < LSysCurrent.Len() && LSysCurrent[i] != 'B')		// this still loops when there is a non-B char at the end
@@ -159,7 +152,10 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 		{
 		case 'A':
 			LSysNext += Rule_A;
-			DrumsLSystem();//		bang drums every beat - their L-System runs in that manner
+			if (playDrums == true)
+			{
+				DrumsLSystem();//		bang drums every beat - their L-System runs in that manner
+			}
 			break;
 		case 'C':
 			LSysNext += Rule_C;
@@ -168,7 +164,6 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 				if (stem[stem.size()-1][beat] == 1)
 				{
 					NotesLSystem(playArpeggio);// calling this will always play a chord
-					UE_LOG(LogTemp, Warning, TEXT("CALLING NOTES"));
 				}
 			}
 			break;
@@ -200,7 +195,6 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 				mySynth->SetAttackTime(10);
 				mySynth->SetReleaseTime(100);
 				mySynth->SetEnablePolyphony(false);
-				UE_LOG(LogTemp, Warning, TEXT("ARPEGGIO SET"));
 			}
 			break;
 		case '-':
@@ -209,18 +203,33 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 			{
 				playArpeggio = false;
 				mySynth->SetEnablePolyphony(true);
-				UE_LOG(LogTemp, Warning, TEXT("ARPEGGIO UN-SET"));
+				mySynth->SetAttackTime(FMath::RandRange(10, 2000));
+				mySynth->SetReleaseTime(FMath::RandRange(10, 1000));
 			}
 			break;
 		case '[':
 			LSysNext += Rule_Branch;
 			//handles branching
-			growth.clear();
+			branch.clear();
 			for (int grow = 0; grow < 16; grow++)
 			{
-				growth.push_back(FMath::RandRange(0, 1));
+				branch.push_back(FMath::RandRange(0, 4));		// this gives a one in 5 chance of being a note to play
 			}
-			stem.push_back(growth);
+			stem.push_back(branch);
+			++branchesOnTheTree;
+			if (branchesOnTheTree >= treeSize)
+			{
+				if (playDrums == false)
+				{
+					playDrums = true;
+				}
+				else {
+					playDrums = false;
+				}
+				treeSize += FMath::RandRange(2, 5);
+				UE_LOG(LogTemp, Warning, TEXT("TreeSize: %d"), treeSize);
+			}
+			UE_LOG(LogTemp, Warning, TEXT("BranchSize: %d"), branchesOnTheTree);
 			break;
 		case ']':
 			LSysNext += Rule_EndBranch;
@@ -265,24 +274,17 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 		i = 0;
 		++generation;
 		LSysNext = "";
-		if (generation >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
-		{
-			playDrums = true;
-		}
-		else if (generation >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
-		{
-			playDrums = false;
-		}
-		else if (generation >= 6)					// make the greater than value a modifiable variable
-		{
-			playDrums = true;
-		}
 	}
 	//keep track of which beat we are on
 	++beat;
 	if (beat >= 15)
 	{
 		beat = 0;
+		++bar;
+		if (bar >= 300)
+		{
+			bar = 0;
+		}
 	}
 }
 
@@ -403,7 +405,6 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 			currentNote = 0;
 			NotesLSysNext = "";
 			Notesgeneration = 0;
-			playDrums = false;
 			Notesreset = false;
 		}
 
@@ -415,29 +416,15 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 			Notesi = 0;
 			++Notesgeneration;
 			NotesLSysNext = "";
-			if (Notesgeneration >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
-			{
-				playDrums = true;
-			}
-			else if (Notesgeneration >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
-			{
-				playDrums = false;
-			}
-			else if (Notesgeneration >= 6)					// make the greater than value a modifiable variable
-			{
-				playDrums = true;
-			}
 		}
 	}
 
 	if (arpeggio)		// the arpeggio plays the last played chord's notes. This helps with congruency
 	{
 
-		UE_LOG(LogTemp, Warning, TEXT("PLAYING NOTE"));
 		switch (arpeggioCounter)
 		{
 		case 0:
-			UE_LOG(LogTemp, Error, TEXT("case 0"));
 			if (useMajorChords)
 			{		//			<choose note in scale array>					<add triad to that number to make chord>
 				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][2], true, false);
@@ -464,7 +451,6 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 			}
 			break;
 		case 1:
-			UE_LOG(LogTemp, Error, TEXT("case 1"));
 			if (useMajorChords)
 			{		//			<choose note in scale array>					<add triad to that number to make chord>
 				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], true, false);
@@ -491,7 +477,6 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 			}
 			break;
 		case 2:
-			UE_LOG(LogTemp, Error, TEXT("case 2"));
 			if (useMajorChords)
 			{		//			<choose note in scale array>					<add triad to that number to make chord>
 				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][1], true, false);
@@ -527,7 +512,6 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 		{
 			arpeggioCounter = 0;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("ARPEGGIO COUNTER: %d"), arpeggioCounter);
 
 
 	} else {
@@ -642,7 +626,6 @@ void ALSystemSynth::ModularLSystem()
 		currentNote = 0;
 		ModularLSysNext = "";
 		Modulargeneration = 0;
-		playDrums = false;
 		Modularreset = false;
 	}
 
@@ -654,18 +637,6 @@ void ALSystemSynth::ModularLSystem()
 		Modulari = 0;
 		++Modulargeneration;
 		ModularLSysNext = "";
-		if (Modulargeneration >= 3)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
-		{
-			playDrums = true;
-		}
-		else if (Modulargeneration >= 5)					// make the greater than value a modifiable variable // ************does this work? More testing
-		{
-			playDrums = false;
-		}
-		else if (Modulargeneration >= 6)					// make the greater than value a modifiable variable
-		{
-			playDrums = true;
-		}
 	}
 }
 
@@ -767,7 +738,6 @@ void ALSystemSynth::DrumsLSystem()
 		currentNote = 0;
 		DrumsLSysNext = "";
 		Drumsgeneration = 0;
-		playDrums = false;
 		Drumsreset = false;
 	}
 

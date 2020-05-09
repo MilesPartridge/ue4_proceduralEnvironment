@@ -153,9 +153,11 @@ public:
 	FString LSysNext;
 	FString LSysResetAxiom = "ACB";
 	bool reset = false, playDrums = false;
-	std::vector<int> growth;
+	std::vector<int> branch;
 	std::vector<std::vector<int>> stem; //set up a pattern for chords to play (and branch to and from)
-	int beat = 0;
+	int branchesOnTheTree = 0;
+	int treeSize;
+	int beat = 0, bar = 0;
 	FString Rule_A = "CABE", Rule_C = "CADB", Rule_D = "+ACB", Rule_E = "-CAB", Rule_F = "", Rule_G = "", Rule_H = "", Rule_Plus = "CAB]", Rule_Minus = "CAB[", Rule_Branch = "", Rule_EndBranch = "";
 	//      Drums L-system 
 	FString DrumsLSysCurrent = "ADBDB";
