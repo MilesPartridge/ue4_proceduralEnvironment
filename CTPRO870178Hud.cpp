@@ -39,10 +39,12 @@ void ACTPRO870178Hud::DrawHUD()
 	// We dont want the onscreen hud when using a HMD device	
 	if (bWantHUD == true)
 	{
+		/*
 		// Get our vehicle so we can check if we are in car. If we are we don't want onscreen HUD
 		ACTPRO870178Pawn* Vehicle = Cast<ACTPRO870178Pawn>(GetOwningPawn());
 		if ((Vehicle != nullptr) && (Vehicle->bInCarCameraActive == false))
 		{
+			
 			FVector2D ScaleVec(HUDYRatio * 1.4f, HUDYRatio * 1.4f);
 
 			// Speed
@@ -55,6 +57,7 @@ void ACTPRO870178Hud::DrawHUD()
 			GearTextItem.Scale = ScaleVec;
 			Canvas->DrawItem(GearTextItem);
 		}
+		*/
 	}
 }
 

@@ -240,10 +240,19 @@ public:
 
 
 
-
+	// set axiom, reset all l-systems
 
 	UFUNCTION(BlueprintCallable, Category = "L System Functions")
 		void Set_New_Axiom(FString axiom);
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		void Set_New_Drum_Axiom(FString axiom);
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		void Set_New_Notes_Axiom(FString axiom);
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		void Set_New_Modular_Axiom(FString axiom);
 
 
 

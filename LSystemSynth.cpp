@@ -258,8 +258,6 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 	{
 		LSysCurrent = LSysResetAxiom;
 		i = 0;
-		octaveShifter = 0;
-		currentNote = 0;
 		LSysNext = "";
 		generation = 0;
 		playDrums = false;
@@ -317,13 +315,13 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 					currentNote += 7;
 				break;
 			case '+':
-				NotesLSysNext += NotesRule_E;
+				NotesLSysNext += NotesRule_Plus;
 				octaveShifter += 12;
 				if (octaveShifter > 50)
 					octaveShifter -= 12;
 				break;
 			case '-':
-				NotesLSysNext += NotesRule_F;
+				NotesLSysNext += NotesRule_Minus;
 				octaveShifter -= 12;
 				if (octaveShifter < -12)
 					octaveShifter += 12;
@@ -358,8 +356,8 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 				chordChooser = 0;
 				maxNoChords = 4;
 				break;
-			case 'E':
-				NotesLSysNext += NotesRule_Plus;
+			case 'J':
+				NotesLSysNext += NotesRule_J;
 				//set dim
 				useDiminishedChords = true;
 				useMajorChords = false;
@@ -369,7 +367,7 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 				maxNoChords = 12;
 				break;
 			case 'F':
-				NotesLSysNext += NotesRule_Minus;
+				NotesLSysNext += NotesRule_F;
 				//move chord
 				//choose randomly?
 				chordChooser = FMath::RandRange(0, maxNoChords - 1);
@@ -381,7 +379,7 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 				}
 				*/
 				break;
-			case 'J':
+			case 'E':
 				//				handling note offs
 
 				NotesLSysNext += NotesRule_J;
@@ -389,6 +387,12 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 
 				break;
 
+			case '[':
+				NotesLSysNext += NotesRule_Branch;
+				break;
+			case ']':
+				NotesLSysNext += NotesRule_EndBranch;
+				break;
 			}
 
 			++Notesi;
@@ -610,9 +614,19 @@ void ALSystemSynth::ModularLSystem()
 			break;
 		case 'J':
 			ModularLSysNext += ModularRule_J;
-			mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0]);
 			break;
-
+		case '+':
+			ModularLSysNext += ModularRule_Plus;
+			break;
+		case '-':
+			ModularLSysNext += ModularRule_Minus;
+			break;
+		case '[':
+			ModularLSysNext += ModularRule_Branch;
+			break;
+		case ']':
+			ModularLSysNext += ModularRule_EndBranch;
+			break;
 		}
 
 		++Modulari;
@@ -626,8 +640,6 @@ void ALSystemSynth::ModularLSystem()
 	{
 		ModularLSysCurrent = ModularLSysResetAxiom;
 		Modulari = 0;
-		octaveShifter = 0;
-		currentNote = 0;
 		ModularLSysNext = "";
 		Modulargeneration = 0;
 		Modularreset = false;
@@ -688,6 +700,7 @@ void ALSystemSynth::DrumsLSystem()
 			//this is used for drum fills
 			break;
 		case 'G':
+			DrumsLSysNext += DrumsRule_G;
 			//randomly play kick or snare
 			kickSnareRandomiser = FMath::RandRange(0, 1);
 			if (kickSnareRandomiser)
@@ -704,6 +717,7 @@ void ALSystemSynth::DrumsLSystem()
 			}
 			break;
 		case 'H':
+			DrumsLSysNext += DrumsRule_H;
 			//this is used for drum fills
 			if (Kick_01_Component && playDrums)
 			{
@@ -711,11 +725,15 @@ void ALSystemSynth::DrumsLSystem()
 			}
 			break;
 		case 'I':
+			DrumsLSysNext += DrumsRule_I;
 			//this is used for drum fills
 			if (Snare_01_Component && playDrums)
 			{
 				Snare_01_Component->Play(0.0f);
 			}
+			break;
+		case 'J':
+			DrumsLSysNext += DrumsRule_J;
 			break;
 		case '+':
 			DrumsLSysNext += DrumsRule_Plus;
@@ -724,6 +742,12 @@ void ALSystemSynth::DrumsLSystem()
 			DrumsLSysNext += DrumsRule_Minus;
 			break;
 
+		case '[':
+			DrumsLSysNext += DrumsRule_Branch;
+			break;
+		case ']':
+			DrumsLSysNext += DrumsRule_EndBranch;
+			break;
 
 		}
 
@@ -738,8 +762,6 @@ void ALSystemSynth::DrumsLSystem()
 	{
 		DrumsLSysCurrent = DrumsLSysResetAxiom;
 		Drumsi = 0;
-		octaveShifter = 0;
-		currentNote = 0;
 		DrumsLSysNext = "";
 		Drumsgeneration = 0;
 		Drumsreset = false;
@@ -1053,7 +1075,41 @@ void ALSystemSynth::Set_New_Axiom(FString axiom)
 {
 	LSysResetAxiom = axiom;
 	reset = true;
+	Drumsreset = true;
+	Notesreset = true;
+	Modularreset = true;
 }
+
+
+void ALSystemSynth::Set_New_Drum_Axiom(FString axiom)
+{
+	DrumsLSysResetAxiom = axiom;
+	reset = true;
+	Drumsreset = true;
+	Notesreset = true;
+	Modularreset = true;
+}
+
+
+void ALSystemSynth::Set_New_Notes_Axiom(FString axiom)
+{
+	NotesLSysResetAxiom = axiom;
+	reset = true;
+	Drumsreset = true;
+	Notesreset = true;
+	Modularreset = true;
+}
+
+
+void ALSystemSynth::Set_New_Modular_Axiom(FString axiom)
+{
+	ModularLSysCurrent = axiom;
+	reset = true;
+	Drumsreset = true;
+	Notesreset = true;
+	Modularreset = true;
+}
+
 
 
 
@@ -1118,6 +1174,8 @@ void ALSystemSynth::Save_Game()
 	if (ULSystemSaveManager* SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::CreateSaveGameObject(ULSystemSaveManager::StaticClass())))
 	{
 		// Set data on the savegame object.
+
+		//rhythm system
 		SaveGameInstance->Axiom = LSysResetAxiom;
 		SaveGameInstance->Rule_A = Rule_A;
 		SaveGameInstance->Rule_C = Rule_C;
@@ -1126,8 +1184,61 @@ void ALSystemSynth::Save_Game()
 		SaveGameInstance->Rule_F = Rule_F;
 		SaveGameInstance->Rule_G = Rule_G;
 		SaveGameInstance->Rule_H = Rule_H;
+		SaveGameInstance->Rule_I = Rule_I;
+		SaveGameInstance->Rule_J = Rule_J;
 		SaveGameInstance->Rule_Plus = Rule_Plus;
 		SaveGameInstance->Rule_Minus = Rule_Minus;
+		SaveGameInstance->Rule_Branch = Rule_Branch;
+		SaveGameInstance->Rule_EndBranch = Rule_EndBranch;
+
+		//notes system
+		SaveGameInstance->NotesAxiom = NotesLSysResetAxiom;
+		SaveGameInstance->NotesRule_A = NotesRule_A;
+		SaveGameInstance->NotesRule_C = NotesRule_C;
+		SaveGameInstance->NotesRule_D = NotesRule_D;
+		SaveGameInstance->NotesRule_E = NotesRule_E;
+		SaveGameInstance->NotesRule_F = NotesRule_F;
+		SaveGameInstance->NotesRule_G = NotesRule_G;
+		SaveGameInstance->NotesRule_H = NotesRule_H;
+		SaveGameInstance->NotesRule_I = NotesRule_I;
+		SaveGameInstance->NotesRule_J = NotesRule_J;
+		SaveGameInstance->NotesRule_Plus = NotesRule_Plus;
+		SaveGameInstance->NotesRule_Minus = NotesRule_Minus;
+		SaveGameInstance->NotesRule_Branch = NotesRule_Branch;
+		SaveGameInstance->NotesRule_EndBranch = NotesRule_EndBranch;
+
+		//Drums system
+		SaveGameInstance->DrumsAxiom = DrumsLSysResetAxiom;
+		SaveGameInstance->DrumsRule_A = DrumsRule_A;
+		SaveGameInstance->DrumsRule_C = DrumsRule_C;
+		SaveGameInstance->DrumsRule_D = DrumsRule_D;
+		SaveGameInstance->DrumsRule_E = DrumsRule_E;
+		SaveGameInstance->DrumsRule_F = DrumsRule_F;
+		SaveGameInstance->DrumsRule_G = DrumsRule_G;
+		SaveGameInstance->DrumsRule_H = DrumsRule_H;
+		SaveGameInstance->DrumsRule_I = DrumsRule_I;
+		SaveGameInstance->DrumsRule_J = DrumsRule_J;
+		SaveGameInstance->DrumsRule_Plus = DrumsRule_Plus;
+		SaveGameInstance->DrumsRule_Minus = DrumsRule_Minus;
+		SaveGameInstance->DrumsRule_Branch = DrumsRule_Branch;
+		SaveGameInstance->DrumsRule_EndBranch = DrumsRule_EndBranch;
+
+		//Modular system
+		SaveGameInstance->ModularAxiom = ModularLSysResetAxiom;
+		SaveGameInstance->ModularRule_A = ModularRule_A;
+		SaveGameInstance->ModularRule_C = ModularRule_C;
+		SaveGameInstance->ModularRule_D = ModularRule_D;
+		SaveGameInstance->ModularRule_E = ModularRule_E;
+		SaveGameInstance->ModularRule_F = ModularRule_F;
+		SaveGameInstance->ModularRule_G = ModularRule_G;
+		SaveGameInstance->ModularRule_H = ModularRule_H;
+		SaveGameInstance->ModularRule_I = ModularRule_I;
+		SaveGameInstance->ModularRule_J = ModularRule_J;
+		SaveGameInstance->ModularRule_Plus = ModularRule_Plus;
+		SaveGameInstance->ModularRule_Minus = ModularRule_Minus;
+		SaveGameInstance->ModularRule_Branch = ModularRule_Branch;
+		SaveGameInstance->ModularRule_EndBranch = ModularRule_EndBranch;
+
 
 
 		// Save the data immediately.
