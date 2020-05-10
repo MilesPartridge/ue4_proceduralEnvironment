@@ -1,2 +1,3 @@
 # ue4_proceduralEnvironment
-A car game which moves with you, unlimited in any direction, spawns random pieces of scenery around you. Yet to produce algorithmic music to go with it.
+The music is entirely produced by itself, using an L-System to drive it.
+A car game which moves with you, unlimited in any direction, spawns random pieces of scenery around you. 
