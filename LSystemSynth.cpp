@@ -1113,7 +1113,7 @@ void ALSystemSynth::Set_New_Modular_Axiom(FString axiom)
 
 
 
-
+// create getters
 
 
 FString ALSystemSynth::Get_Rule_A()
@@ -1151,6 +1151,16 @@ FString ALSystemSynth::Get_Rule_H()
 	return Rule_H;
 }
 
+FString ALSystemSynth::Get_Rule_I()
+{
+	return Rule_I;
+}
+
+FString ALSystemSynth::Get_Rule_J()
+{
+	return Rule_J;
+}
+
 FString ALSystemSynth::Get_Rule_Plus()
 {
 	return Rule_Plus;
@@ -1161,15 +1171,231 @@ FString ALSystemSynth::Get_Rule_Minus()
 	return Rule_Minus;
 }
 
-FString ALSystemSynth::Get_New_Axiom()
+FString ALSystemSynth::Get_Rule_Branch()
 {
-	return LSysResetAxiom;
-	reset = true;
+	return Rule_Branch;
+}
+
+FString ALSystemSynth::Get_Rule_EndBranch()
+{
+	return Rule_EndBranch;
 }
 
 
 
-void ALSystemSynth::Save_Game()
+
+
+FString ALSystemSynth::Get_NotesRule_A()
+{
+	return NotesRule_A;
+}
+
+FString ALSystemSynth::Get_NotesRule_C()
+{
+	return NotesRule_C;
+}
+
+FString ALSystemSynth::Get_NotesRule_D()
+{
+	return NotesRule_D;
+}
+
+FString ALSystemSynth::Get_NotesRule_E()
+{
+	return NotesRule_E;
+}
+
+FString ALSystemSynth::Get_NotesRule_F()
+{
+	return NotesRule_F;
+}
+
+FString ALSystemSynth::Get_NotesRule_G()
+{
+	return NotesRule_G;
+}
+
+FString ALSystemSynth::Get_NotesRule_H()
+{
+	return NotesRule_H;
+}
+
+FString ALSystemSynth::Get_NotesRule_I()
+{
+	return NotesRule_I;
+}
+
+FString ALSystemSynth::Get_NotesRule_J()
+{
+	return NotesRule_J;
+}
+
+FString ALSystemSynth::Get_NotesRule_Plus()
+{
+	return NotesRule_Plus;
+}
+
+FString ALSystemSynth::Get_NotesRule_Minus()
+{
+	return NotesRule_Minus;
+}
+
+FString ALSystemSynth::Get_NotesRule_Branch()
+{
+	return NotesRule_Branch;
+}
+
+FString ALSystemSynth::Get_NotesRule_EndBranch()
+{
+	return NotesRule_EndBranch;
+}
+
+
+
+
+
+FString ALSystemSynth::Get_ModularRule_A()
+{
+	return ModularRule_A;
+}
+
+FString ALSystemSynth::Get_ModularRule_C()
+{
+	return ModularRule_C;
+}
+
+FString ALSystemSynth::Get_ModularRule_D()
+{
+	return ModularRule_D;
+}
+
+FString ALSystemSynth::Get_ModularRule_E()
+{
+	return ModularRule_E;
+}
+
+FString ALSystemSynth::Get_ModularRule_F()
+{
+	return ModularRule_F;
+}
+
+FString ALSystemSynth::Get_ModularRule_G()
+{
+	return ModularRule_G;
+}
+
+FString ALSystemSynth::Get_ModularRule_H()
+{
+	return ModularRule_H;
+}
+
+FString ALSystemSynth::Get_ModularRule_I()
+{
+	return ModularRule_I;
+}
+
+FString ALSystemSynth::Get_ModularRule_J()
+{
+	return ModularRule_J;
+}
+
+FString ALSystemSynth::Get_ModularRule_Plus()
+{
+	return ModularRule_Plus;
+}
+
+FString ALSystemSynth::Get_ModularRule_Minus()
+{
+	return ModularRule_Minus;
+}
+
+FString ALSystemSynth::Get_ModularRule_Branch()
+{
+	return ModularRule_Branch;
+}
+
+FString ALSystemSynth::Get_ModularRule_EndBranch()
+{
+	return ModularRule_EndBranch;
+}
+
+
+
+
+
+
+FString ALSystemSynth::Get_DrumsRule_A()
+{
+	return DrumsRule_A;
+}
+
+FString ALSystemSynth::Get_DrumsRule_C()
+{
+	return DrumsRule_C;
+}
+
+FString ALSystemSynth::Get_DrumsRule_D()
+{
+	return DrumsRule_D;
+}
+
+FString ALSystemSynth::Get_DrumsRule_E()
+{
+	return DrumsRule_E;
+}
+
+FString ALSystemSynth::Get_DrumsRule_F()
+{
+	return DrumsRule_F;
+}
+
+FString ALSystemSynth::Get_DrumsRule_G()
+{
+	return DrumsRule_G;
+}
+
+FString ALSystemSynth::Get_DrumsRule_H()
+{
+	return DrumsRule_H;
+}
+
+FString ALSystemSynth::Get_DrumsRule_I()
+{
+	return DrumsRule_I;
+}
+
+FString ALSystemSynth::Get_DrumsRule_J()
+{
+	return DrumsRule_J;
+}
+
+FString ALSystemSynth::Get_DrumsRule_Plus()
+{
+	return DrumsRule_Plus;
+}
+
+FString ALSystemSynth::Get_DrumsRule_Minus()
+{
+	return DrumsRule_Minus;
+}
+
+FString ALSystemSynth::Get_DrumsRule_Branch()
+{
+	return DrumsRule_Branch;
+}
+
+FString ALSystemSynth::Get_DrumsRule_EndBranch()
+{
+	return DrumsRule_EndBranch;
+}
+
+
+
+
+
+
+
+void ALSystemSynth::Save_Game(FString SaveSlotName)
 {
 	if (ULSystemSaveManager* SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::CreateSaveGameObject(ULSystemSaveManager::StaticClass())))
 	{
@@ -1242,19 +1468,19 @@ void ALSystemSynth::Save_Game()
 
 
 		// Save the data immediately.
-		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, "LSystem", 0))
+		if (UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveSlotName, 0))
 		{
 			// Save succeeded.
-			UE_LOG(LogTemp, Warning, TEXT("Save Successful"));
+			UE_LOG(LogTemp, Warning, TEXT("Save Successful: %s"), *SaveSlotName);
 		}
 	}
 }
 
-void ALSystemSynth::Load_Game()
+void ALSystemSynth::Load_Game(FString SaveSlotName)
 {
 	ULSystemSaveManager* SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::CreateSaveGameObject(ULSystemSaveManager::StaticClass()));
 
-	SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::LoadGameFromSlot("LSystem", 0));
+	SaveGameInstance = Cast<ULSystemSaveManager>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
 
 	LSysResetAxiom = SaveGameInstance->Axiom;
 	Rule_A = SaveGameInstance->Rule_A;
@@ -1264,11 +1490,63 @@ void ALSystemSynth::Load_Game()
 	Rule_F = SaveGameInstance->Rule_F;
 	Rule_G = SaveGameInstance->Rule_G;
 	Rule_H = SaveGameInstance->Rule_H;
+	Rule_I = SaveGameInstance->Rule_I;
+	Rule_J = SaveGameInstance->Rule_J;
 	Rule_Plus = SaveGameInstance->Rule_Plus;
 	Rule_Minus = SaveGameInstance->Rule_Minus;
+	Rule_Branch = SaveGameInstance->Rule_Branch;
+	Rule_EndBranch = SaveGameInstance->Rule_EndBranch;
+
+	NotesLSysResetAxiom = SaveGameInstance->NotesAxiom;
+	NotesRule_A = SaveGameInstance->NotesRule_A;
+	NotesRule_C = SaveGameInstance->NotesRule_C;
+	NotesRule_D = SaveGameInstance->NotesRule_D;
+	NotesRule_E = SaveGameInstance->NotesRule_E;
+	NotesRule_F = SaveGameInstance->NotesRule_F;
+	NotesRule_G = SaveGameInstance->NotesRule_G;
+	NotesRule_H = SaveGameInstance->NotesRule_H;
+	NotesRule_I = SaveGameInstance->NotesRule_I;
+	NotesRule_J = SaveGameInstance->NotesRule_J;
+	NotesRule_Plus = SaveGameInstance->NotesRule_Plus;
+	NotesRule_Minus = SaveGameInstance->NotesRule_Minus;
+	NotesRule_Branch = SaveGameInstance->NotesRule_Branch;
+	NotesRule_EndBranch = SaveGameInstance->NotesRule_EndBranch;
+
+	ModularLSysResetAxiom = SaveGameInstance->ModularAxiom;
+	ModularRule_A = SaveGameInstance->ModularRule_A;
+	ModularRule_C = SaveGameInstance->ModularRule_C;
+	ModularRule_D = SaveGameInstance->ModularRule_D;
+	ModularRule_E = SaveGameInstance->ModularRule_E;
+	ModularRule_F = SaveGameInstance->ModularRule_F;
+	ModularRule_G = SaveGameInstance->ModularRule_G;
+	ModularRule_H = SaveGameInstance->ModularRule_H;
+	ModularRule_I = SaveGameInstance->ModularRule_I;
+	ModularRule_J = SaveGameInstance->ModularRule_J;
+	ModularRule_Plus = SaveGameInstance->ModularRule_Plus;
+	ModularRule_Minus = SaveGameInstance->ModularRule_Minus;
+	ModularRule_Branch = SaveGameInstance->ModularRule_Branch;
+	ModularRule_EndBranch = SaveGameInstance->ModularRule_EndBranch;
+
+	DrumsLSysResetAxiom = SaveGameInstance->DrumsAxiom;
+	DrumsRule_A = SaveGameInstance->DrumsRule_A;
+	DrumsRule_C = SaveGameInstance->DrumsRule_C;
+	DrumsRule_D = SaveGameInstance->DrumsRule_D;
+	DrumsRule_E = SaveGameInstance->DrumsRule_E;
+	DrumsRule_F = SaveGameInstance->DrumsRule_F;
+	DrumsRule_G = SaveGameInstance->DrumsRule_G;
+	DrumsRule_H = SaveGameInstance->DrumsRule_H;
+	DrumsRule_I = SaveGameInstance->DrumsRule_I;
+	DrumsRule_J = SaveGameInstance->DrumsRule_J;
+	DrumsRule_Plus = SaveGameInstance->DrumsRule_Plus;
+	DrumsRule_Minus = SaveGameInstance->DrumsRule_Minus;
+	DrumsRule_Branch = SaveGameInstance->DrumsRule_Branch;
+	DrumsRule_EndBranch = SaveGameInstance->DrumsRule_EndBranch;
 
 	reset = true;
+	Drumsreset = true;
+	Modularreset = true;
+	Notesreset = true;
 
-	UE_LOG(LogTemp, Warning, TEXT("Load Complete"));
+	UE_LOG(LogTemp, Warning, TEXT("Load Complete: %s"), *SaveSlotName);
 }
 

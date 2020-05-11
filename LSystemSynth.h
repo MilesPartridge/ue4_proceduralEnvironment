@@ -287,6 +287,14 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_Rule_I();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_Rule_J();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
 		FString Get_Rule_Plus();
 
 
@@ -295,16 +303,172 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "L System Functions")
-		FString Get_New_Axiom();
+		FString Get_Rule_Branch();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_Rule_EndBranch();
 
 
 
 
 	UFUNCTION(BlueprintCallable, Category = "L System Functions")
-		void Save_Game();
+		FString Get_NotesRule_A();
+
 
 	UFUNCTION(BlueprintCallable, Category = "L System Functions")
-		void Load_Game();
+		FString Get_NotesRule_C();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_D();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_E();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_F();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_G();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_H();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_I();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_J();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_Plus();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_Minus();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_Branch();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_NotesRule_EndBranch();
+
+
+
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_A();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_C();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_D();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_E();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_F();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_G();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_H();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_I();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_J();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_Plus();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_Minus();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_Branch();
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_ModularRule_EndBranch();
+
+
+
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_A();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_C();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_D();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_E();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_F();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_G();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_H();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_I();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_J();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_Plus();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_Minus();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_Branch();
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		FString Get_DrumsRule_EndBranch();
+
+
+
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		void Save_Game(FString SaveSlotName = "Save1");
+
+	UFUNCTION(BlueprintCallable, Category = "L System Functions")
+		void Load_Game(FString SaveSlotName = "Save1");
 
 
 
