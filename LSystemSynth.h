@@ -519,7 +519,7 @@ public:
 	FString ModularRule_A = "ACDEB", ModularRule_C = "[", ModularRule_D = "]", ModularRule_E = "+", ModularRule_F = "DIAB", ModularRule_G = "FAB-", ModularRule_H = "GDFAB", ModularRule_I = "FAB", ModularRule_Plus = "IFJEB", ModularRule_Minus = "DAB", ModularRule_J = "HEB", ModularRule_Branch = "IJHB", ModularRule_EndBranch = "AH+CB";
 	int attack, decay, release;
 	float sustain, lfoGain = 0;
-	int waveForm, LFOpatchSelector = 0;
+	int waveForm, LFOpatchSelector = 0, filterFreq = 500;
 	bool DelaySetter = false, ChorusSetter = false;
 
 

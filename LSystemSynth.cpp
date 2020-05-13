@@ -114,6 +114,9 @@ void ALSystemSynth::BeginPlay()
 	mySynth->SetEnablePolyphony(true);
 	mySynth->SetOscType(0, ESynth1OscType::Square);  
 	mySynth->SetChorusEnabled(ChorusSetter);
+	mySynth->SetEnableLegato(false);
+	mySynth->SetEnableUnison(true);
+	mySynth->SetEnableRetrigger(true);
 
 	i = 0;
 	LSysNext = "";
@@ -122,8 +125,8 @@ void ALSystemSynth::BeginPlay()
 	branch.clear();
 	for (int grow = 0; grow < growthSize; grow++)
 	{						
-							// this gives a one in 5 chance of being a note to play
-		branch.push_back(FMath::RandRange(0, 4));		
+							// this gives a one in 4 chance of being a note to play
+		branch.push_back(FMath::RandRange(0, 3));		
 	}
 	stem.push_back(branch);
 
@@ -230,7 +233,7 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 			branch.clear();
 			for (int grow = 0; grow < growthSize; grow++)
 			{
-				branch.push_back(FMath::RandRange(0, 4));								// this gives a one in 5 chance of being a note to play
+				branch.push_back(FMath::RandRange(0, 3));								// this gives a one in 4 chance of being a note to play
 			}
 			stem.push_back(branch);
 			++branchesOnTheTree;
@@ -442,7 +445,6 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 						--noteBranchIterator;
 					}
 				}
-				UE_LOG(LogTemp, Warning, TEXT("noteBranchIterator: %d"), noteBranchIterator);
 				break;
 			case ']':
 				NotesLSysNext += NotesRule_EndBranch;
@@ -454,8 +456,6 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 						--noteBranchIterator;
 					}
 				}
-				UE_LOG(LogTemp, Warning, TEXT("notestem after popback: %d"), noteStem.size());
-				UE_LOG(LogTemp, Warning, TEXT("noteBranchIterator: %d"), noteBranchIterator);
 				break;
 			}
 
@@ -603,8 +603,6 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 				noteStem.push_back(noteBranch);
 				noteBranch.clear();
 			}
-
-			UE_LOG(LogTemp, Warning, TEXT("notestem: %d"), noteStem.size());
 		}
 	}
 }
@@ -623,23 +621,27 @@ void ALSystemSynth::ModularLSystem()
 		{
 		case 'A':
 			ModularLSysNext += ModularRule_A;
-			attack = FMath::RandRange(10, 2000);
-			mySynth->SetAttackTime(attack);	
+			attack = FMath::RandRange(10, 500);
+			mySynth->SetAttackTime(attack);
+			UE_LOG(LogTemp, Warning, TEXT("attack: %d"), attack);
 			break;
 		case 'C':
 			ModularLSysNext += ModularRule_C;
-			decay = FMath::RandRange(10, 1000);
+			decay = FMath::RandRange(10, 600);
 			mySynth->SetDecayTime(decay);
+			UE_LOG(LogTemp, Warning, TEXT("decay: %d"), decay);
 			break;
 		case 'D':
 			ModularLSysNext += ModularRule_D;
-			sustain = FMath::RandRange(0.01f, 1.0f);
+			sustain = FMath::RandRange(0.5f, 1.0f);
 			mySynth->SetSustainGain(sustain);
+			UE_LOG(LogTemp, Warning, TEXT("sus: %f"), sustain);
 			break;
 		case 'E':
 			ModularLSysNext += ModularRule_E;
 			release = FMath::RandRange(10, 600);
 			mySynth->SetReleaseTime(release);
+			UE_LOG(LogTemp, Warning, TEXT("release: %d"), release);
 			break;
 		case 'F':
 			//random waveform picker
@@ -649,22 +651,28 @@ void ALSystemSynth::ModularLSystem()
 			{
 			case 0:
 				mySynth->SetOscType(0, ESynth1OscType::Sine);
+				UE_LOG(LogTemp, Warning, TEXT("waveform: sine"));
 				break;
 			case 1:
 				mySynth->SetOscType(0, ESynth1OscType::Saw);
+				UE_LOG(LogTemp, Warning, TEXT("waveform: saw"));
 				break;
 			case 2:
 				mySynth->SetOscType(0, ESynth1OscType::Triangle);
+				UE_LOG(LogTemp, Warning, TEXT("waveform: tri"));
 				break;
 			case 3:
 				mySynth->SetOscType(0, ESynth1OscType::Square);
+				UE_LOG(LogTemp, Warning, TEXT("waveform: square"));
 				break;
 			}
 			break;
 		case 'G':
 			ModularLSysNext += ModularRule_G;
 			//filter randomiser
-			mySynth->SetFilterFrequency(FMath::RandRange(150, 16500));
+			filterFreq = FMath::RandRange(200, 16500);
+			mySynth->SetFilterFrequency(filterFreq);
+			UE_LOG(LogTemp, Error, TEXT("Filter Freq: %d"), filterFreq);
 			break;
 		case 'H':
 			ModularLSysNext += ModularRule_H;
@@ -673,15 +681,19 @@ void ALSystemSynth::ModularLSystem()
 			{
 			case 0:
 				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToFilterFreq);
+				UE_LOG(LogTemp, Warning, TEXT("LFO: filter"));
 				break;
 			case 1:
-				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToGain);
+		//		mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToGain); // this was causing chaos
+				UE_LOG(LogTemp, Warning, TEXT("LFO: gain"));
 				break;
 			case 2:
 				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToOscFreq);
+				UE_LOG(LogTemp, Warning, TEXT("LFO: pitch"));
 				break;
 			case 3:
 				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToFilterQ);
+				UE_LOG(LogTemp, Warning, TEXT("LFO: reso"));
 				break;
 			}
 			++LFOpatchSelector;
@@ -701,13 +713,13 @@ void ALSystemSynth::ModularLSystem()
 			}
 			mySynth->SetChorusEnabled(ChorusSetter);
 
-			mySynth->SetChorusDepth(FMath::RandRange(0.0f, 0.9f));
-			mySynth->SetChorusFeedback(FMath::RandRange(0.0f, 0.5f));
+			mySynth->SetChorusDepth(FMath::RandRange(0.0f, 0.7f));
+			mySynth->SetChorusFeedback(FMath::RandRange(0.0f, 0.7f));
 			mySynth->SetChorusFrequency(FMath::RandRange(0.0f, 1.5f));
 			break;
 		case 'J':
 			ModularLSysNext += ModularRule_J;
-			lfoGain = FMath::RandRange(0.0f, 0.9f);
+			lfoGain = FMath::RandRange(0.2f, 0.8f);
 			mySynth->SetLFOGain(0, lfoGain);
 			break;
 		case '+':
