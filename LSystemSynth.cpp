@@ -113,6 +113,7 @@ void ALSystemSynth::BeginPlay()
 
 	mySynth->SetEnablePolyphony(true);
 	mySynth->SetOscType(0, ESynth1OscType::Square);  
+	mySynth->SetChorusEnabled(true);
 
 	i = 0;
 	LSysNext = "";
@@ -662,27 +663,111 @@ void ALSystemSynth::ModularLSystem()
 			break;
 		case 'G':
 			ModularLSysNext += ModularRule_G;
+			//filter randomiser
+			mySynth->SetFilterFrequency(FMath::RandRange(150, 16500));
 			break;
 		case 'H':
 			ModularLSysNext += ModularRule_H;
+			// lfo patch randomiser
+			switch (LFOpatchSelector)
+			{
+			case 0:
+				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToFilterFreq);
+				break;
+			case 1:
+				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToGain);
+				break;
+			case 2:
+				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToOscFreq);
+				break;
+			case 3:
+				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToFilterQ);
+				break;
+			}
+			++LFOpatchSelector;
+			if (LFOpatchSelector > 3)
+			{
+				LFOpatchSelector = 0;
+			}
 			break;
 		case 'I':
 			ModularLSysNext += ModularRule_I;
+			// chorus randomiser
+			mySynth->SetChorusDepth(FMath::RandRange(0.0f, 1.5f));
+			mySynth->SetChorusFeedback(FMath::RandRange(0.0f, 1.5f));
+			mySynth->SetChorusFrequency(FMath::RandRange(0.0f, 1.5f));
 			break;
 		case 'J':
 			ModularLSysNext += ModularRule_J;
+			mySynth->SetLFOGain(0, FMath::RandRange(0.0f, 1.5f));
 			break;
 		case '+':
 			ModularLSysNext += ModularRule_Plus;
+			mySynth->SetLFOFrequency(0, FMath::RandRange(0.4f, 20.2f));
 			break;
 		case '-':
 			ModularLSysNext += ModularRule_Minus;
+			switch (LFOpatchSelector)
+			{
+			case 0:
+				mySynth->SetLFOType(0, ESynthLFOType::Sine);
+				break;
+			case 1:
+				mySynth->SetLFOType(0, ESynthLFOType::DownSaw);
+				break;
+			case 2:
+				mySynth->SetLFOType(0, ESynthLFOType::RandomSampleHold);
+				break;
+			case 3:
+				mySynth->SetLFOType(0, ESynthLFOType::Square);
+				break;
+			}
+			++LFOpatchSelector;
+			if (LFOpatchSelector > 3)
+			{
+				LFOpatchSelector = 0;
+			}
 			break;
 		case '[':
 			ModularLSysNext += ModularRule_Branch;
+			//set delay
+			if (DelaySetter == true)
+			{
+				DelaySetter = false;
+			} else {
+				DelaySetter = true;
+			}
+			mySynth->SetStereoDelayIsEnabled(DelaySetter);
 			break;
 		case ']':
 			ModularLSysNext += ModularRule_EndBranch;
+			//randomise all delay parameters
+			mySynth->SetStereoDelayFeedback(FMath::RandRange(0.0f, 1.5f));
+			mySynth->SetStereoDelayRatio(FMath::RandRange(0.5f, 1.5f));
+			mySynth->SetStereoDelayTime(FMath::RandRange(10, 750));
+			mySynth->SetStereoDelayWetlevel(FMath::RandRange(0.0f, 1.0f));
+
+			switch (LFOpatchSelector)
+			{
+			case 0:
+				mySynth->SetStereoDelayMode(ESynthStereoDelayMode::Count);
+				break;
+			case 1:
+				mySynth->SetStereoDelayMode(ESynthStereoDelayMode::Cross);
+				break;
+			case 2:
+				mySynth->SetStereoDelayMode(ESynthStereoDelayMode::Normal);
+				break;
+			case 3:
+				mySynth->SetStereoDelayMode(ESynthStereoDelayMode::PingPong);
+				break;
+			}
+			++LFOpatchSelector;		
+			//using lfopatchselector in multiple parts adds randomness to all parts, but still will be the same each l-system
+			if (LFOpatchSelector > 3)
+			{
+				LFOpatchSelector = 0;
+			}
 			break;
 		}
 

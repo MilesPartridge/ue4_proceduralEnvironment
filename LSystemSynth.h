@@ -519,7 +519,8 @@ public:
 	FString ModularRule_A = "ACDEB", ModularRule_C = "", ModularRule_D = "", ModularRule_E = "", ModularRule_F = "DIAB", ModularRule_G = "FAB", ModularRule_H = "GDFAB", ModularRule_I = "FAB", ModularRule_Plus = "IFJEB", ModularRule_Minus = "DAB", ModularRule_J = "HEB", ModularRule_Branch = "", ModularRule_EndBranch = "";
 	int attack, decay, release;
 	float sustain;
-	int waveForm;
+	int waveForm, LFOpatchSelector = 0;
+	bool DelaySetter = false;
 
 	std::vector<int> Major_Scale = { 0, 2, 4, 5, 7, 9, 11 };
 	std::vector<int> Minor_Scale = { 0, 2, 3, 5, 7, 8, 10 };
