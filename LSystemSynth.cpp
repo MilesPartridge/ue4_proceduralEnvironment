@@ -113,7 +113,7 @@ void ALSystemSynth::BeginPlay()
 
 	mySynth->SetEnablePolyphony(true);
 	mySynth->SetOscType(0, ESynth1OscType::Square);  
-	mySynth->SetChorusEnabled(true);
+	mySynth->SetChorusEnabled(ChorusSetter);
 
 	i = 0;
 	LSysNext = "";
@@ -693,13 +693,22 @@ void ALSystemSynth::ModularLSystem()
 		case 'I':
 			ModularLSysNext += ModularRule_I;
 			// chorus randomiser
-			mySynth->SetChorusDepth(FMath::RandRange(0.0f, 1.5f));
-			mySynth->SetChorusFeedback(FMath::RandRange(0.0f, 1.5f));
+			if (ChorusSetter == true)
+			{
+				ChorusSetter = false;
+			} else {
+				ChorusSetter = true;
+			}
+			mySynth->SetChorusEnabled(ChorusSetter);
+
+			mySynth->SetChorusDepth(FMath::RandRange(0.0f, 0.9f));
+			mySynth->SetChorusFeedback(FMath::RandRange(0.0f, 0.5f));
 			mySynth->SetChorusFrequency(FMath::RandRange(0.0f, 1.5f));
 			break;
 		case 'J':
 			ModularLSysNext += ModularRule_J;
-			mySynth->SetLFOGain(0, FMath::RandRange(0.0f, 1.5f));
+			lfoGain = FMath::RandRange(0.0f, 0.9f);
+			mySynth->SetLFOGain(0, lfoGain);
 			break;
 		case '+':
 			ModularLSysNext += ModularRule_Plus;
@@ -742,10 +751,10 @@ void ALSystemSynth::ModularLSystem()
 		case ']':
 			ModularLSysNext += ModularRule_EndBranch;
 			//randomise all delay parameters
-			mySynth->SetStereoDelayFeedback(FMath::RandRange(0.0f, 1.5f));
-			mySynth->SetStereoDelayRatio(FMath::RandRange(0.5f, 1.5f));
+			mySynth->SetStereoDelayFeedback(FMath::RandRange(0.0f, 0.9f));
+			mySynth->SetStereoDelayRatio(FMath::RandRange(0.01f, 0.99f));
 			mySynth->SetStereoDelayTime(FMath::RandRange(10, 750));
-			mySynth->SetStereoDelayWetlevel(FMath::RandRange(0.0f, 1.0f));
+			mySynth->SetStereoDelayWetlevel(FMath::RandRange(0.0f, 0.7f));
 
 			switch (LFOpatchSelector)
 			{
