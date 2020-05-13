@@ -10,6 +10,14 @@
 #include "GameFramework/Actor.h"
 #include "LSystemSynth.generated.h"
 
+enum Scale
+{
+	Major = 0, 
+	Minor = 1, 
+	Lydian = 2, Augmented = 2, 
+	Mixolydian = 3, Diminished = 3
+};
+
 UCLASS()
 class CTPRO870178_API ALSystemSynth : public AActor
 {
@@ -478,11 +486,14 @@ public:
 	FString LSysNext;
 	FString LSysResetAxiom = "ACB";
 	bool reset = false, playDrums = false;
+
 	std::vector<int> branch;
 	std::vector<std::vector<int>> stem; //set up a pattern for chords to play (and branch to and from)
+	int growthSize = 8;
 	int branchesOnTheTree = 0;
 	int treeSize;
 	int beat = 0, bar = 0;
+
 	FString Rule_A = "CABE", Rule_C = "CADB", Rule_D = "+ACB", Rule_E = "-CAB", Rule_F = "", Rule_G = "", Rule_H = "", Rule_Plus = "CAB]", Rule_Minus = "CAB[", Rule_Branch = "", Rule_EndBranch = "", Rule_I = "", Rule_J = "";
 	//      Drums L-system 
 	FString DrumsLSysCurrent = "ADBDB";
@@ -510,14 +521,31 @@ public:
 	float sustain;
 	int waveForm;
 
-	std::vector<int> notesToPlayCMajor = {36, 38, 40, 41, 43, 45, 47};
+	std::vector<int> Major_Scale = { 0, 2, 4, 5, 7, 9, 11 };
+	std::vector<int> Minor_Scale = { 0, 2, 3, 5, 7, 8, 10 };
+	std::vector<int> Lydian_Scale = { 0, 2, 4, 6, 7, 9, 11 };
+	std::vector<int> Mixolydian_Scale = { 0, 1, 2, 5, 6, 7, 10 };
+	std::vector<std::vector<int>> Scales;
+	Scale scaleInUse = Major;
+	int noteOfScale = 0;
 	int octaveShifter = 0;
-	int currentNote = 0;
+	int currentKey = 36; // this is C
+
+	//note branching variables
+	int triadNote1, triadNote2, triadNote3;
+	std::vector<int> triad;
+	std::vector<std::vector<int>> noteBranch;
+	std::vector<std::vector<std::vector<int>>> noteStem;
+	int noteBranchIterator = 0, noteTriadToPlay = 0;
+
 	char c;
 	std::vector<std::vector<int>> MajorChords;
 	std::vector<std::vector<int>> MinorChords;
 	std::vector<std::vector<int>> AugmentedChords;
 	std::vector<std::vector<int>> DiminishedChords;
+	std::vector<std::vector<std::vector<int>>> Chords;
+	Scale chordTypeInUse = Major;
+
 	bool useMajorChords = true, useMinorChords = false, useAugmentedChords = false, useDiminishedChords = false;
 	int chordChooser = 0;
 	int maxNoChords = 12;

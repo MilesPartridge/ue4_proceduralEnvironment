@@ -90,12 +90,26 @@ ALSystemSynth::ALSystemSynth()
 	DiminishedChords.push_back(std::vector<int>{3, 6, 9});
 	DiminishedChords.push_back(std::vector<int>{4, 7, 10});
 	DiminishedChords.push_back(std::vector<int>{5, 8, 11});
+	
+	
+	
+	
+	
+	Scales.push_back(Major_Scale);
+	Scales.push_back(Minor_Scale);
+	Scales.push_back(Lydian_Scale);
+	Scales.push_back(Mixolydian_Scale);
 }
 
 // Called when the game starts or when spawned
 void ALSystemSynth::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	Chords.push_back(MajorChords);
+	Chords.push_back(MinorChords);
+	Chords.push_back(AugmentedChords);
+	Chords.push_back(DiminishedChords);
 
 	mySynth->SetEnablePolyphony(true);
 	mySynth->SetOscType(0, ESynth1OscType::Square);  
@@ -103,15 +117,17 @@ void ALSystemSynth::BeginPlay()
 	i = 0;
 	LSysNext = "";
 
-	//set up a pattern for chords to play (and branch to and from)
+		//set up a pattern for chords to play (and branch to and from)
 	branch.clear();
-	for (int grow = 0; grow < 16; grow++)
-	{
-		branch.push_back(FMath::RandRange(0, 4));		// this gives a one in 5 chance of being a note to play
+	for (int grow = 0; grow < growthSize; grow++)
+	{						
+							// this gives a one in 5 chance of being a note to play
+		branch.push_back(FMath::RandRange(0, 4));		
 	}
 	stem.push_back(branch);
 
-	treeSize = FMath::RandRange(3, 5); // this is the number of branches produced before the song moves on to its next part
+	// this is the number of branches produced before the song moves on to its next part
+	treeSize = FMath::RandRange(3, 5); 
 
 
 	if (Kick_01_Component && kick_01)
@@ -211,9 +227,9 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 			LSysNext += Rule_Branch;
 			//handles branching
 			branch.clear();
-			for (int grow = 0; grow < 16; grow++)
+			for (int grow = 0; grow < growthSize; grow++)
 			{
-				branch.push_back(FMath::RandRange(0, 4));		// this gives a one in 5 chance of being a note to play
+				branch.push_back(FMath::RandRange(0, 4));								// this gives a one in 5 chance of being a note to play
 			}
 			stem.push_back(branch);
 			++branchesOnTheTree;
@@ -227,9 +243,7 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 					playDrums = false;
 				}
 				treeSize += FMath::RandRange(2, 5);
-				UE_LOG(LogTemp, Warning, TEXT("TreeSize: %d"), treeSize);
 			}
-			UE_LOG(LogTemp, Warning, TEXT("BranchSize: %d"), branchesOnTheTree);
 			break;
 		case ']':
 			LSysNext += Rule_EndBranch;
@@ -300,19 +314,37 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 			switch (c)
 			{
 			case 'A':
+				// this cycles through available scales
 				NotesLSysNext += NotesRule_A;
+
+				if (scaleInUse == Major)
+				{
+					scaleInUse = Minor;
+				}
+				else if (scaleInUse == Minor)
+				{
+					scaleInUse = Lydian;
+				}
+				else if (scaleInUse == Lydian)
+				{
+					scaleInUse = Mixolydian;
+				}
+				else if (scaleInUse == Mixolydian)
+				{
+					scaleInUse = Major;
+				}
 				break;
 			case 'C': 	// if an arpeggio is playing, it will play with the current chord, this stops any shifting of notes
 				NotesLSysNext += NotesRule_C;
-				currentNote += 5;
-				if (currentNote > 6)
-					currentNote -= 7;
+				noteOfScale += 5;
+				if (noteOfScale > 6)
+					noteOfScale -= 7;
 				break;
 			case 'D':
 				NotesLSysNext += NotesRule_D;
-				currentNote -= 3;
-				if (currentNote < 0)
-					currentNote += 7;
+				noteOfScale -= 3;
+				if (noteOfScale < 0)
+					noteOfScale += 7;
 				break;
 			case '+':
 				NotesLSysNext += NotesRule_Plus;
@@ -329,40 +361,52 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 			case 'G':
 				NotesLSysNext += NotesRule_G;
 				//set major
+				chordTypeInUse = Major;
+				/*
 				useMajorChords = true;
 				useMinorChords = false;
 				useAugmentedChords = false;
 				useDiminishedChords = false;
+				*/
 				chordChooser = 0;
 				maxNoChords = 12;
 				break;
 			case 'H':
 				NotesLSysNext += NotesRule_H;
 				//set minor
+				chordTypeInUse = Minor;
+				/*
 				useMinorChords = true;
 				useMajorChords = false;
 				useAugmentedChords = false;
 				useDiminishedChords = false;
+				*/
 				chordChooser = 0;
 				maxNoChords = 12;
 				break;
 			case 'I':
 				NotesLSysNext += NotesRule_I;
 				//set aug
+				chordTypeInUse = Augmented;
+				/*
 				useAugmentedChords = true;
 				useMajorChords = false;
 				useMinorChords = false;
 				useDiminishedChords = false;
+				*/
 				chordChooser = 0;
 				maxNoChords = 4;
 				break;
 			case 'J':
 				NotesLSysNext += NotesRule_J;
 				//set dim
+				chordTypeInUse = Diminished;
+				/*
 				useDiminishedChords = true;
 				useMajorChords = false;
 				useMinorChords = false;
 				useAugmentedChords = false;
+				*/
 				chordChooser = 0;
 				maxNoChords = 12;
 				break;
@@ -380,18 +424,37 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 				*/
 				break;
 			case 'E':
-				//				handling note offs
-
-				NotesLSysNext += NotesRule_J;
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], true, false);
+				NotesLSysNext += NotesRule_E;
+				//				move key in circle of fifths
+				currentKey += 5;
+				if (currentKey > 42)	// chosen 42 to keep C (36) in the middle
+					currentKey -= 12;
 
 				break;
-
 			case '[':
 				NotesLSysNext += NotesRule_Branch;
+				if (noteStem.size() > 1)
+				{
+					++noteBranchIterator;
+					while (noteStem.size() <= noteBranchIterator)
+					{
+						--noteBranchIterator;
+					}
+				}
+				UE_LOG(LogTemp, Warning, TEXT("noteBranchIterator: %d"), noteBranchIterator);
 				break;
 			case ']':
 				NotesLSysNext += NotesRule_EndBranch;
+				if (noteStem.size() > 1)
+				{
+					noteStem.pop_back();
+					while (noteStem.size() <= noteBranchIterator)
+					{
+						--noteBranchIterator;
+					}
+				}
+				UE_LOG(LogTemp, Warning, TEXT("notestem after popback: %d"), noteStem.size());
+				UE_LOG(LogTemp, Warning, TEXT("noteBranchIterator: %d"), noteBranchIterator);
 				break;
 			}
 
@@ -406,10 +469,13 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 			NotesLSysCurrent = NotesLSysResetAxiom;
 			Notesi = 0;
 			octaveShifter = 0;
-			currentNote = 0;
+			currentKey = 36;
 			NotesLSysNext = "";
 			Notesgeneration = 0;
 			Notesreset = false;
+			noteStem.clear();
+			noteBranch.clear();
+			triad.clear();
 		}
 
 
@@ -423,130 +489,121 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 		}
 	}
 
-	if (arpeggio)		// the arpeggio plays the last played chord's notes. This helps with congruency
+	if (noteStem.size() < 1)		// if the stem is ready, loop. Keep looping until a branch is triggered
 	{
-
-		switch (arpeggioCounter)
+		if (arpeggio)		// the arpeggio plays the last played chord's notes. This helps with congruency
 		{
-		case 0:
-			if (useMajorChords)
-			{		//			<choose note in scale array>					<add triad to that number to make chord>
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][2], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], FMath::RandRange(100, 127));
-			}
-			if (useMinorChords)
+			switch (arpeggioCounter)
 			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][2], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][0], FMath::RandRange(100, 127));
+			case 0:
+				mySynth->NoteOff(1, true, false);
+				mySynth->NoteOn(Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][0], FMath::RandRange(100, 127));
+				break;
+			case 1:
+				mySynth->NoteOff(1, true, false);
+				mySynth->NoteOn(Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][1], FMath::RandRange(100, 127));
+				break;
+			case 2:
+				mySynth->NoteOff(1, true, false);
+				mySynth->NoteOn(Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][2], FMath::RandRange(100, 127));
+				break;
+			default:
+				UE_LOG(LogTemp, Error, TEXT("DEFAULT TRIGGERED: ARPEGGIO !!!!!"));
+				break;
 			}
-			if (useAugmentedChords)
+
+			++arpeggioCounter;
+			if (arpeggioCounter >= 3)
 			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][2], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][0], FMath::RandRange(100, 127));
+				arpeggioCounter = 0;
 			}
-			if (useDiminishedChords)
-			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][2], true, false);
 
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][0], FMath::RandRange(100, 127));
-			}
-			break;
-		case 1:
-			if (useMajorChords)
-			{		//			<choose note in scale array>					<add triad to that number to make chord>
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][1], FMath::RandRange(100, 127));
-			}
-			if (useMinorChords)
-			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][0], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][1], FMath::RandRange(100, 127));
-			}
-			if (useAugmentedChords)
-			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][0], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][1], FMath::RandRange(100, 127));
-			}
-			if (useDiminishedChords)
-			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][0], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][1], FMath::RandRange(100, 127));
-			}
-			break;
-		case 2:
-			if (useMajorChords)
-			{		//			<choose note in scale array>					<add triad to that number to make chord>
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][1], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][2], FMath::RandRange(100, 127));
-			}
-			if (useMinorChords)
-			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][1], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][2], FMath::RandRange(100, 127));
-			}
-			if (useAugmentedChords)
-			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][1], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][2], FMath::RandRange(100, 127));
-			}
-			if (useDiminishedChords)
-			{
-				mySynth->NoteOff(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][1], true, false);
-
-				mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][2], FMath::RandRange(100, 127));
-			}
-			break;
-		default:
-			UE_LOG(LogTemp, Error, TEXT("DEFAULT TRIGGERED !!!!!"));
-			break;
 		}
+		else {		// if not arpeggio, then play a chord
+			mySynth->NoteOff(1, true, false);
+			mySynth->NoteOn(Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5f, 2.0f));
+			mySynth->NoteOn(Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5f, 2.0f));
+			mySynth->NoteOn(Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5f, 2.0f));
 
-		++arpeggioCounter;
-		if (arpeggioCounter >= 3)
-		{
-			arpeggioCounter = 0;
+			// all branch initialisation here
+			triadNote1 = Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][0];
+			triadNote2 = Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][1];
+			triadNote3 = Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][2];
+
+			triad.push_back(triadNote1);
+			triad.push_back(triadNote2);
+			triad.push_back(triadNote3);
+
+			noteBranch.push_back(triad);
+			triad.clear();
+
+			if (noteBranch.size() >= growthSize)
+			{
+				noteStem.push_back(noteBranch);
+				noteBranch.clear();
+			}
 		}
-
-
 	} else {
-		UE_LOG(LogTemp, Error, TEXT("CHORD PLAYING"));
-		if (useMajorChords)
-		{		//			<choose note in scale array>					<add triad to that number to make chord>
-			mySynth->NoteOff(1, true, false);
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MajorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-		}
-		if (useMinorChords)
+		if (arpeggio)		// the arpeggio plays the last played chord's notes. This helps with congruency
 		{
-			mySynth->NoteOff(1, true, false);
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + MinorChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+			switch (arpeggioCounter)
+			{
+			case 0:
+				mySynth->NoteOff(1, true, false);
+				mySynth->NoteOn(noteStem[noteBranchIterator][noteTriadToPlay][0], FMath::RandRange(100, 127));
+				break;
+			case 1:
+				mySynth->NoteOff(1, true, false);
+				mySynth->NoteOn(noteStem[noteBranchIterator][noteTriadToPlay][1], FMath::RandRange(100, 127));
+				break;
+			case 2:
+				mySynth->NoteOff(1, true, false);
+				mySynth->NoteOn(noteStem[noteBranchIterator][noteTriadToPlay][2], FMath::RandRange(100, 127));
+				break;
+			default:
+				UE_LOG(LogTemp, Error, TEXT("DEFAULT TRIGGERED: ARPEGGIO !!!!!"));
+				break;
+			}
+
+			++arpeggioCounter;
+			if (arpeggioCounter >= 3)
+			{
+				arpeggioCounter = 0;
+			}
+
 		}
-		if (useAugmentedChords)
-		{
+		else {		// if not arpeggio, then play a chord
 			mySynth->NoteOff(1, true, false);
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + AugmentedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-		}
-		if (useDiminishedChords)
-		{
-			mySynth->NoteOff(1, true, false);
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][0], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][1], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
-			mySynth->NoteOn(notesToPlayCMajor[currentNote] + octaveShifter + DiminishedChords[chordChooser][2], FMath::RandRange(100, 127), FMath::RandRange(0.5, 2));
+
+			mySynth->NoteOn(noteStem[noteBranchIterator][noteTriadToPlay][0], FMath::RandRange(100, 127), FMath::RandRange(0.5f, 2.0f));
+			mySynth->NoteOn(noteStem[noteBranchIterator][noteTriadToPlay][1], FMath::RandRange(100, 127), FMath::RandRange(0.5f, 2.0f));
+			mySynth->NoteOn(noteStem[noteBranchIterator][noteTriadToPlay][2], FMath::RandRange(100, 127), FMath::RandRange(0.5f, 2.0f));
+
+			++noteTriadToPlay;
+			if (noteTriadToPlay >= growthSize)
+			{
+				noteTriadToPlay = 0;
+			}
+
+			// next branch initialisation here
+			triadNote1 = Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][0];
+			triadNote2 = Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][1];
+			triadNote3 = Scales[scaleInUse][noteOfScale] + currentKey + octaveShifter + Chords[chordTypeInUse][chordChooser][2];
+
+			triad.push_back(triadNote1);
+			triad.push_back(triadNote2);
+			triad.push_back(triadNote3);
+
+			noteBranch.push_back(triad);
+			triad.clear();
+
+			if (noteBranch.size() >= growthSize)
+			{
+				noteStem.push_back(noteBranch);
+				noteBranch.clear();
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("notestem: %d"), noteStem.size());
 		}
 	}
 }
