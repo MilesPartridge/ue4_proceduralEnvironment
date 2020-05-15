@@ -94,7 +94,7 @@ ALSystemSynth::ALSystemSynth()
 	
 	
 	
-	
+	//set up scales
 	Scales.push_back(Major_Scale);
 	Scales.push_back(Minor_Scale);
 	Scales.push_back(Lydian_Scale);
@@ -237,7 +237,7 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 			}
 			stem.push_back(branch);
 			++branchesOnTheTree;
-			if (branchesOnTheTree >= treeSize)
+			if (branchesOnTheTree >= treeSize)		// as the tree grows, set drums to play and stop playing
 			{
 				if (playDrums == false)
 				{
@@ -246,7 +246,7 @@ void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the
 				else {
 					playDrums = false;
 				}
-				treeSize += FMath::RandRange(2, 5);
+				treeSize += FMath::RandRange(2, 5);	// set the drums to start/stop in a number of branches
 			}
 			break;
 		case ']':
@@ -450,10 +450,14 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 				NotesLSysNext += NotesRule_EndBranch;
 				if (noteStem.size() > 1)
 				{
-					noteStem.pop_back();
+					noteStem.erase(noteStem.begin() + noteBranchIterator);	// erase the branch at the iterator
+					if (noteBranchIterator > 0)
+					{
+						--noteBranchIterator;								// return to the previous branch
+					}
 					while (noteStem.size() <= noteBranchIterator)
 					{
-						--noteBranchIterator;
+						--noteBranchIterator;								// check iterator is not out of bounds
 					}
 				}
 				break;
@@ -938,11 +942,11 @@ void ALSystemSynth::DrumsLSystem()
 		Drumsi = 0;
 		++Drumsgeneration;
 		DrumsLSysNext = "";
-		if (Drumsgeneration == 12)							// make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
+		if (Drumsgeneration == 12)							// idea: make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
 		{
 			DrumsLSysCurrent = DrumsRule_E;
 		}
-		else if (Drumsgeneration >= 16)					// make the greater than value a modifiable variable // ************does this work? More testing
+		else if (Drumsgeneration >= 16)					// idea: make the greater than value a modifiable variable // 
 		{
 			DrumsLSysCurrent = DrumsRule_C;
 			Drumsgeneration = 0;
