@@ -503,6 +503,16 @@ public:
 	bool Drumsreset = false;
 	FString DrumsRule_A = "CDBDB", DrumsRule_C = "ADBDB", DrumsRule_D = "", DrumsRule_E = "FHDBHDB", DrumsRule_F = "EGDBGDB", DrumsRule_Plus = "", DrumsRule_Minus = "", DrumsRule_G = "", DrumsRule_H = "", DrumsRule_I = "", DrumsRule_J = "", DrumsRule_Branch = "", DrumsRule_EndBranch = "";
 	int kickSnareRandomiser;
+	//drums branching
+	int kickValue = 0, snareValue = 0, HHValue = 0;
+	std::vector<int> kickLoop;
+	std::vector<int> snareLoop;
+	std::vector<int> HHLoop;
+	std::vector<std::vector<int>> drumsBranch;
+	std::vector<std::vector<std::vector<int>>> drumsStem;
+	bool drumLooping = false, drumFill = false;
+	int currentDrumBranch = 0, loopPoint = 0, previousDrumBranch = 0;
+	int branchKick = 0, branchSnare = 1, branchHH = 2;
 	//      Notes L-system 
 	FString NotesLSysCurrent = "++AB";
 	int Notesi, Notesgeneration = 0;

@@ -158,15 +158,12 @@ void ALSystemSynth::Tick(float DeltaTime)
 
 void ALSystemSynth::TickLSystem()		// this L-System will sort the rhythm for the drums and notes
 {
-	//
-//	c = LSysCurrent[i];
+	
 
-
-
-	while (i < LSysCurrent.Len() && LSysCurrent[i] != 'B')		// this still loops when there is a non-B char at the end
+	while (i < LSysCurrent.Len() && LSysCurrent[i] != 'B')		
 	{
 
-		c = LSysCurrent[i];		// to avoid recopying this each iteration of the loop, make this a char* pointer to the ith point in the string
+		c = LSysCurrent[i];		
 
 		switch (c)
 		{
@@ -310,10 +307,10 @@ void ALSystemSynth::NotesLSystem(bool arpeggio)
 	//	c = LSysCurrent[i];
 	if (!arpeggio)		// note the arpeggio completely disregards the L-System and plays the last played chord's notes
 	{
-		while (Notesi < NotesLSysCurrent.Len() && NotesLSysCurrent[Notesi] != 'B')		// this still loops when there is a non-B char at the end
+		while (Notesi < NotesLSysCurrent.Len() && NotesLSysCurrent[Notesi] != 'B')		
 		{
 
-			c = NotesLSysCurrent[Notesi];		// to avoid recopying this each iteration of the loop, make this a char* pointer to the ith point in the string
+			c = NotesLSysCurrent[Notesi];		
 
 			switch (c)
 			{
@@ -617,9 +614,9 @@ void ALSystemSynth::ModularLSystem()
 
 	//	c = LSysCurrent[i];
 
-	while (Modulari < ModularLSysCurrent.Len() && ModularLSysCurrent[Modulari] != 'B')		// this still loops when there is a non-B char at the end
+	while (Modulari < ModularLSysCurrent.Len() && ModularLSysCurrent[Modulari] != 'B')		
 	{
-		c = ModularLSysCurrent[Modulari];		// to avoid recopying this each iteration of the loop, make this a char* pointer to the ith point in the string
+		c = ModularLSysCurrent[Modulari];		
 
 		switch (c)
 		{
@@ -627,25 +624,21 @@ void ALSystemSynth::ModularLSystem()
 			ModularLSysNext += ModularRule_A;
 			attack = FMath::RandRange(10, 500);
 			mySynth->SetAttackTime(attack);
-			UE_LOG(LogTemp, Warning, TEXT("attack: %d"), attack);
 			break;
 		case 'C':
 			ModularLSysNext += ModularRule_C;
 			decay = FMath::RandRange(10, 600);
 			mySynth->SetDecayTime(decay);
-			UE_LOG(LogTemp, Warning, TEXT("decay: %d"), decay);
 			break;
 		case 'D':
 			ModularLSysNext += ModularRule_D;
 			sustain = FMath::RandRange(0.5f, 1.0f);
 			mySynth->SetSustainGain(sustain);
-			UE_LOG(LogTemp, Warning, TEXT("sus: %f"), sustain);
 			break;
 		case 'E':
 			ModularLSysNext += ModularRule_E;
 			release = FMath::RandRange(10, 600);
 			mySynth->SetReleaseTime(release);
-			UE_LOG(LogTemp, Warning, TEXT("release: %d"), release);
 			break;
 		case 'F':
 			//random waveform picker
@@ -655,19 +648,15 @@ void ALSystemSynth::ModularLSystem()
 			{
 			case 0:
 				mySynth->SetOscType(0, ESynth1OscType::Sine);
-				UE_LOG(LogTemp, Warning, TEXT("waveform: sine"));
 				break;
 			case 1:
 				mySynth->SetOscType(0, ESynth1OscType::Saw);
-				UE_LOG(LogTemp, Warning, TEXT("waveform: saw"));
 				break;
 			case 2:
 				mySynth->SetOscType(0, ESynth1OscType::Triangle);
-				UE_LOG(LogTemp, Warning, TEXT("waveform: tri"));
 				break;
 			case 3:
 				mySynth->SetOscType(0, ESynth1OscType::Square);
-				UE_LOG(LogTemp, Warning, TEXT("waveform: square"));
 				break;
 			}
 			break;
@@ -676,7 +665,6 @@ void ALSystemSynth::ModularLSystem()
 			//filter randomiser
 			filterFreq = FMath::RandRange(200, 16500);
 			mySynth->SetFilterFrequency(filterFreq);
-			UE_LOG(LogTemp, Error, TEXT("Filter Freq: %d"), filterFreq);
 			break;
 		case 'H':
 			ModularLSysNext += ModularRule_H;
@@ -685,19 +673,16 @@ void ALSystemSynth::ModularLSystem()
 			{
 			case 0:
 				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToFilterFreq);
-				UE_LOG(LogTemp, Warning, TEXT("LFO: filter"));
 				break;
 			case 1:
 		//		mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToGain); // this was causing chaos
-				UE_LOG(LogTemp, Warning, TEXT("LFO: gain"));
+		//		UE_LOG(LogTemp, Warning, TEXT("LFO: gain"));
 				break;
 			case 2:
 				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToOscFreq);
-				UE_LOG(LogTemp, Warning, TEXT("LFO: pitch"));
 				break;
 			case 3:
 				mySynth->SetLFOPatch(0, ESynthLFOPatchType::PatchToFilterQ);
-				UE_LOG(LogTemp, Warning, TEXT("LFO: reso"));
 				break;
 			}
 			++LFOpatchSelector;
@@ -827,35 +812,56 @@ void ALSystemSynth::ModularLSystem()
 void ALSystemSynth::DrumsLSystem()
 {
 	
+	kickValue = 0;		// initially, set the values for branching to 0
+	snareValue = 0; 
+	HHValue = 0;
+	UE_LOG(LogTemp, Error, TEXT("drum stem size: %d"), drumsStem.size());
+	if (drumsStem.size() > 0)
+	{
+		drumLooping = true;
+	} else {
+		drumLooping = false;
+	}
 
-	//	c = LSysCurrent[i];
-
-	while (Drumsi < DrumsLSysCurrent.Len() && DrumsLSysCurrent[Drumsi] != 'B')		// this still loops when there is a non-B char at the end
+	while (Drumsi < DrumsLSysCurrent.Len() && DrumsLSysCurrent[Drumsi] != 'B')		
 	{
 
-		c = DrumsLSysCurrent[Drumsi];		// to avoid recopying this each iteration of the loop, make this a char* pointer to the ith point in the string
+		c = DrumsLSysCurrent[Drumsi];		 
 
 		switch (c)
 		{
 		case 'A':
 			DrumsLSysNext += DrumsRule_A;
-			if (Kick_01_Component && playDrums)
+			kickValue = 1;			// when the instrument gets called, set branching values to call it when looped
+			if (!drumLooping)
 			{
-				Kick_01_Component->Play(0.0f);
+				UE_LOG(LogTemp, Warning, TEXT("Being called in Not Drum Looping"));
+				if (Kick_01_Component)
+				{
+					Kick_01_Component->Play(0.0f);
+				}
 			}
 			break;
 		case 'C':
 			DrumsLSysNext += DrumsRule_C;
-			if (Snare_01_Component && playDrums)
+			snareValue = 1;
+			if (!drumLooping)
 			{
-				Snare_01_Component->Play(0.0f);
+				if (Snare_01_Component)
+				{
+					Snare_01_Component->Play(0.0f);
+				}
 			}
 			break;
 		case 'D':
 			DrumsLSysNext += DrumsRule_D;
-			if (HihatClosed_01_Component && playDrums)
+			HHValue = 1;
+			if (!drumLooping)
 			{
-				HihatClosed_01_Component->Play(0.0f);
+				if (HihatClosed_01_Component)
+				{
+					HihatClosed_01_Component->Play(0.0f);
+				}
 			}
 			break;
 		case 'E':
@@ -872,12 +878,12 @@ void ALSystemSynth::DrumsLSystem()
 			kickSnareRandomiser = FMath::RandRange(0, 1);
 			if (kickSnareRandomiser)
 			{
-				if (Kick_01_Component && playDrums)
+				if (Kick_01_Component)
 				{
 					Kick_01_Component->Play(0.0f);
 				}
 			} else {
-				if (Snare_01_Component && playDrums)
+				if (Snare_01_Component)
 				{
 					Snare_01_Component->Play(0.0f);
 				}
@@ -886,7 +892,7 @@ void ALSystemSynth::DrumsLSystem()
 		case 'H':
 			DrumsLSysNext += DrumsRule_H;
 			//this is used for drum fills
-			if (Kick_01_Component && playDrums)
+			if (Kick_01_Component)
 			{
 				Kick_01_Component->Play(0.0f);
 			}
@@ -894,7 +900,7 @@ void ALSystemSynth::DrumsLSystem()
 		case 'I':
 			DrumsLSysNext += DrumsRule_I;
 			//this is used for drum fills
-			if (Snare_01_Component && playDrums)
+			if (Snare_01_Component)
 			{
 				Snare_01_Component->Play(0.0f);
 			}
@@ -911,9 +917,21 @@ void ALSystemSynth::DrumsLSystem()
 
 		case '[':
 			DrumsLSysNext += DrumsRule_Branch;
+			// use this branching sparingly, if overused the drum pattern will be random 
+			// throughout, and fills will mean nothing
+			++currentDrumBranch;
+			while (drumsStem.size() <= currentDrumBranch)
+			{
+				--currentDrumBranch;
+			}
 			break;
 		case ']':
 			DrumsLSysNext += DrumsRule_EndBranch;
+			--currentDrumBranch;
+			if (currentDrumBranch < 0)
+			{
+				currentDrumBranch = 0;
+			}
 			break;
 
 		}
@@ -922,6 +940,57 @@ void ALSystemSynth::DrumsLSystem()
 
 	}
 
+	// after the instruments to be played this beat are determined, put them all into relevant arrays (record)
+	kickLoop.push_back(kickValue);		
+	snareLoop.push_back(snareValue);
+	HHLoop.push_back(HHValue);
+
+	if (kickLoop.size() >= growthSize && snareLoop.size() >= growthSize && HHLoop.size() >= growthSize)
+	{
+		drumsBranch.push_back(kickLoop);
+		drumsBranch.push_back(snareLoop);
+		drumsBranch.push_back(HHLoop);
+		drumsStem.push_back(drumsBranch);
+		// clear and reuse loops and branch, these are now safely stored in Stem
+		kickLoop.clear();		
+		snareLoop.clear();
+		HHLoop.clear();
+		drumsBranch.clear();
+	}
+
+
+	//handle looping once main stem is grown
+	if (drumLooping)
+	{
+		if (drumsStem[currentDrumBranch][branchKick][loopPoint] == 1)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Now being called in Drum Looping"));
+			if (Kick_01_Component)
+			{
+				Kick_01_Component->Play(0.0f);
+			}
+		}
+		if (drumsStem[currentDrumBranch][branchSnare][loopPoint] == 1)
+		{
+			if (Snare_01_Component)
+			{
+				Snare_01_Component->Play(0.0f);
+			}
+		}
+		if (drumsStem[currentDrumBranch][branchHH][loopPoint] == 1)
+		{
+			if (HihatClosed_01_Component)
+			{
+				HihatClosed_01_Component->Play(0.0f);
+			}
+		}
+	}
+
+	++loopPoint; // this moves the iterator to the next drum sample to play
+	if (loopPoint >= growthSize)
+	{		// if loop point goes over growth size, we will be looking past the end of a vector
+		loopPoint = 0;
+	}
 
 	++Drumsi;	// if this point is reached, it means that the while loop has either reached 'B' or has gone out of bounds. Either way, ++i (hence why next 'if' check is set up as is)
 
@@ -932,6 +1001,12 @@ void ALSystemSynth::DrumsLSystem()
 		DrumsLSysNext = "";
 		Drumsgeneration = 0;
 		Drumsreset = false;
+		kickLoop.clear();
+		snareLoop.clear();
+		HHLoop.clear();
+		drumsBranch.clear();
+		drumsStem.clear();
+		drumLooping = false;
 	}
 
 
@@ -942,13 +1017,23 @@ void ALSystemSynth::DrumsLSystem()
 		Drumsi = 0;
 		++Drumsgeneration;
 		DrumsLSysNext = "";
-		if (Drumsgeneration == 12)							// idea: make the greater than value a modifiable variable	// this makes the drums kick in and out, alluding to musical structure
+		// if the generation is a certain size, play a fill
+		if (Drumsgeneration == 12)							// this makes the drum fills, for musical structure
 		{
-			DrumsLSysCurrent = DrumsRule_E;
+			previousDrumBranch = currentDrumBranch;
+			currentDrumBranch = FMath::RandRange(1, drumsStem.size() - 1);	// choose a random branch
+			while (drumsStem.size() <= currentDrumBranch)
+			{
+				--currentDrumBranch;
+			}
 		}
-		else if (Drumsgeneration >= 16)					// idea: make the greater than value a modifiable variable // 
+		else if (Drumsgeneration >= 16)					
 		{
-			DrumsLSysCurrent = DrumsRule_C;
+			currentDrumBranch = previousDrumBranch;				// return to previous branch
+			while (drumsStem.size() <= currentDrumBranch)
+			{
+				--currentDrumBranch;
+			}
 			Drumsgeneration = 0;
 		}
 	}
